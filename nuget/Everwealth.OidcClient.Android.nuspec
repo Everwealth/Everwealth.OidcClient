@@ -17,6 +17,5 @@
   </metadata>
   <files>
     <file src="..\src\Everwealth.OidcClient.Android\bin\Release\Everwealth.OidcClient.dll" target="lib\MonoAndroid10" />
-    <file src="..\src\Everwealth.OidcClient.Android\bin\Release\Everwealth.OidcClient.xml" target="lib\MonoAndroid10" />
   </files>
 </package>

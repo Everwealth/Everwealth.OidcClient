@@ -17,6 +17,5 @@
   </metadata>
   <files>
     <file src="../src/Everwealth.OidcClient.iOS/bin/Release/Everwealth.OidcClient.dll" target="lib\Xamarin.iOS10" />
-    <file src="../src/Everwealth.OidcClient.iOS/bin/Release/Everwealth.OidcClient.xml" target="lib\Xamarin.iOS10" />
   </files>
 </package>
