@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<package>
+  <metadata>
+    <id>Everwealth.OidcClient.iOS</id>
+    <version>1.0.0</version>
+    <authors>Everwealth</authors>
+    <owners>Everwealth</owners>
+    <licenseUrl>https://opensource.org/licenses/Apache-2.0</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Everwealth OIDC Client for Xamarin iOS apps</description>
+    <dependencies>
+      <group targetFramework="Xamarin.iOS10">
+        <dependency id="Everwealth.OidcClient.Core" version="2.4.3" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="../src/Everwealth.OidcClient.iOS/bin/Release/Everwealth.OidcClient.dll" target="lib\Xamarin.iOS10" />
+    <file src="../src/Everwealth.OidcClient.iOS/bin/Release/Everwealth.OidcClient.xml" target="lib\Xamarin.iOS10" />
+  </files>
+</package>
