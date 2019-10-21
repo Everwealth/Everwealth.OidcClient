@@ -11,7 +11,7 @@
     <description>Everwealth OIDC Client for Xamarin iOS apps</description>
     <dependencies>
       <group targetFramework="Xamarin.iOS10">
-        <dependency id="Everwealth.OidcClient.Core" version="2.4.3" />
+        <dependency id="Everwealth.OidcClient.Core" version="1.0.0" />
       </group>
     </dependencies>
   </metadata>
