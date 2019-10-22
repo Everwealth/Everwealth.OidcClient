@@ -35,10 +35,12 @@ namespace Everwealth.OidcClient
 
                 if (response == "UserCancel")
                 {
+                    BrowserMediator.Instance.Cancel();
                     tcs.SetResult(Canceled());
                 }
                 else
                 {
+                    BrowserMediator.Instance.Success();
                     await safari.DismissViewControllerAsync(true); // Close Safari
                     safari.Dispose();
                     tcs.SetResult(Success(response));

@@ -51,11 +51,18 @@ namespace Everwealth.OidcClient
         private static BrowserResult CreateBrowserResult(NSUrl callbackUrl, NSError error)
         {
             if (error == null)
+            {
+                BrowserMediator.Instance.Success();
                 return Success(callbackUrl.AbsoluteString);
+            }
 
             if (error.Code == (long)ASWebAuthenticationSessionErrorCode.CanceledLogin)
+            {
+                BrowserMediator.Instance.Cancel();
                 return Canceled();
+            }
 
+            BrowserMediator.Instance.Cancel();
             return UnknownError(error.ToString());
         }
     }

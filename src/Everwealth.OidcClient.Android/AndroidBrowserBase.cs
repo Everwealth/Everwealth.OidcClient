@@ -48,11 +48,21 @@ namespace Everwealth.OidcClient
                 ActivityMediator.Instance.ActivityMessageReceived -= Callback;
 
                 var cancelled = response == "UserCancel";
+                if (cancelled)
+                {
+                    BrowserMediator.Instance.Cancel();
+                }
+                else
+                {
+                    BrowserMediator.Instance.Success();
+                }
+
                 tcs.SetResult(new BrowserResult
                 {
                     ResultType = cancelled ? BrowserResultType.UserCancel : BrowserResultType.Success,
                     Response = response
                 });
+
             }
 
             ActivityMediator.Instance.ActivityMessageReceived += Callback;
