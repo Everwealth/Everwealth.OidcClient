@@ -2,7 +2,7 @@
 
 <package>
   <metadata>
-    <id>Everwealth.OidcClient</id>
+    <id>Everwealth.OidcClient.Core</id>
     <version>1.0.0</version>
     <authors>Everwealth</authors>
     <owners>Everwealth</owners>
@@ -16,6 +16,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="..\src\Everwealth.OidcClient.Core\bin\Release\netstandard2.0\Everwealth.OidcClient.dll" target="lib\netstandard2.0" />
+    <file src="..\src\Everwealth.OidcClient.Core\bin\Release\netstandard2.0\Everwealth.OidcClient.Core.dll" target="lib\netstandard2.0" />
   </files>
 </package>
