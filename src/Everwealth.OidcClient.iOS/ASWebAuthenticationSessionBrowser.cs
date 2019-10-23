@@ -31,9 +31,9 @@ namespace Everwealth.OidcClient
                     asWebAuthenticationSession.Dispose();
                 });
 
-            // iOS 13 requires the PresentationContextProvider set
-            if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
-                asWebAuthenticationSession.PresentationContextProvider = new PresentationContextProviderToSharedKeyWindow();
+            //// iOS 13 requires the PresentationContextProvider set
+            //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+            //    asWebAuthenticationSession.PresentationContextProvider = new PresentationContextProviderToSharedKeyWindow();
 
             asWebAuthenticationSession.Start();
 
