@@ -1,4 +1,4 @@
-﻿using AuthenticationServices;
+using AuthenticationServices;
 using Foundation;
 using IdentityModel.OidcClient.Browser;
 using System.Threading.Tasks;
@@ -40,13 +40,13 @@ namespace Everwealth.OidcClient
             return tcs.Task;
         }
 
-        class PresentationContextProviderToSharedKeyWindow : NSObject, IASWebAuthenticationPresentationContextProviding
-        {
-            public UIWindow GetPresentationAnchor(ASWebAuthenticationSession session)
-            {
-                return UIApplication.SharedApplication.KeyWindow;
-            }
-        }
+        //class PresentationContextProviderToSharedKeyWindow : NSObject, IASWebAuthenticationPresentationContextProviding
+        //{
+        //    public UIWindow GetPresentationAnchor(ASWebAuthenticationSession session)
+        //    {
+        //        return UIApplication.SharedApplication.KeyWindow;
+        //    }
+        //}
 
         private static BrowserResult CreateBrowserResult(NSUrl callbackUrl, NSError error)
         {
