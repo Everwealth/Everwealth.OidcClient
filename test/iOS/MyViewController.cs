@@ -22,9 +22,13 @@ namespace iOSTestApp
 
             _authClient = new AuthClient(new OidcClientOptions
             {
-                Authority = "https://auth0-dotnet-integration-tests.auth0.com",
-                ClientId = "qmss9A66stPWTOXjR6X1OeA0DLadoNP2",
-                Scope = "openid profile email"
+                Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
+                ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect,
+                Authority = "https://everwealth-stg-sa-idn.azurewebsites.net",
+                ClientId = "everwealth.ios",
+                Scope = "openid",
+                RedirectUri = "com.everwealth.app://auth/callback",
+                Browser = new WKWebViewBrowser()
             });
 
             LoginButton.Clicked += Login;

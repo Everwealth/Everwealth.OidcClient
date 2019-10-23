@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Everwealth.OidcClient</RootNamespace>
-    <AssemblyName>Everwealth.OidcClient</AssemblyName>
+    <AssemblyName>Everwealth.OidcClient.Android</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>

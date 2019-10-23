@@ -8,10 +8,10 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
     <Version>1.0.0</Version>
+    <AssemblyName>Everwealth.OidcClient</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\Everwealth.OidcClient.Core.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
