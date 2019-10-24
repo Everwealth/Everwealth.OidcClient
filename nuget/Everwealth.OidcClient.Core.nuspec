@@ -3,7 +3,7 @@
 <package>
   <metadata>
     <id>Everwealth.OidcClient</id>
-    <version><%version%></version>
+    <version>1.0.0</version>
     <authors>Everwealth</authors>
     <owners>Everwealth</owners>
     <licenseUrl>https://opensource.org/licenses/Apache-2.0</licenseUrl>
