@@ -64,9 +64,10 @@ namespace Everwealth.OidcClient
         }
     }
 
-    public class WKWebViewController : UIViewController
+    public class WKWebViewController : UIViewController, IWKNavigationDelegate
     {
         public WKWebView WebView { get; set; }
+        private UIActivityIndicatorView _activityIndicatorView;
 
         public WKWebViewController(NSUrl startUrl, NSUrl endUrl)
         {
@@ -74,6 +75,7 @@ namespace Everwealth.OidcClient
             webViewConfig.SetUrlSchemeHandler(new CallbackHandler(), endUrl.Scheme);
             WebView = new WKWebView(new CGRect(0, 0, 0, 0), webViewConfig);
             WebView.LoadRequest(new NSUrlRequest(startUrl));
+            WebView.WeakNavigationDelegate = this;
         }
 
         public override void ViewDidLoad()
@@ -93,6 +95,11 @@ namespace Everwealth.OidcClient
             NavigationController.NavigationBar.SetBackgroundImage(new UIImage(), UIBarMetrics.Default);
             NavigationController.NavigationBar.ShadowImage = new UIImage();
             NavigationController.NavigationBar.Translucent = true;
+
+
+            _activityIndicatorView = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray);
+            _activityIndicatorView.HidesWhenStopped = true;
+            WebView.AddSubview(_activityIndicatorView);
         }
 
         public override void LoadView()
@@ -100,10 +107,38 @@ namespace Everwealth.OidcClient
             View = WebView;
         }
 
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+            _activityIndicatorView.Center = View.Center;
+            _activityIndicatorView.StartAnimating();
+        }
+
         private async void Cancelled(object sender, EventArgs e)
         {
             ActivityMediator.Instance.Send("UserCancel");
             await NavigationController.DismissViewControllerAsync(true);
+        }
+
+        [Export("webView:didStartProvisionalNavigation:")]
+        public void DidStartProvisionalNavigation(WKWebView webView, WKNavigation navigation)
+        {
+            _activityIndicatorView.Center = View.Center;
+            _activityIndicatorView.StartAnimating();
+        }
+
+        [Export("webView:didFinishNavigation:")]
+        public void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
+        {
+            _activityIndicatorView.StopAnimating();
+            _activityIndicatorView.Center = View.Center;
+        }
+
+        [Export("webView:didFailNavigation:withError:")]
+        public void DidFailNavigation(WKWebView webView, WKNavigation navigation, NSError error)
+        {
+            _activityIndicatorView.StopAnimating();
+            _activityIndicatorView.Center = View.Center;
         }
 
         private class CallbackHandler : NSObject, IWKUrlSchemeHandler

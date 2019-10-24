@@ -7,9 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F4F201D8-5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{3D6D8AA1-DD3D-4B0D-AEDF-A588704AFE09}"
 	ProjectSection(SolutionItems) = preProject
-		nuget\Everwealth.OidcClient.Android.nuspec = nuget\Everwealth.OidcClient.Android.nuspec
-		nuget\Everwealth.OidcClient.iOS.nuspec = nuget\Everwealth.OidcClient.iOS.nuspec
-		nuget\Everwealth.OidcClient.Core.nuspec = nuget\Everwealth.OidcClient.Core.nuspec
+		nuget\Everwealth.OidcClient.nuspec = nuget\Everwealth.OidcClient.nuspec
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everwealth.OidcClient.Android", "src\Everwealth.OidcClient.Android\Everwealth.OidcClient.Android.csproj", "{A18A146B-FB5A-4AB8-8F1C-501E58AA7D4D}"
