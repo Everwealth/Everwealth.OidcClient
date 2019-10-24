@@ -83,7 +83,7 @@ namespace Everwealth.OidcClient
             // Set up bar button
             var closeBarButton = new UIButton(UIButtonType.System);
             closeBarButton.TouchUpInside += Cancelled;
-            closeBarButton.SetImage(UIImage.FromBundle("close.png"), UIControlState.Normal);
+            closeBarButton.SetImage(UIImage.FromFile(@"close"), UIControlState.Normal);
             closeBarButton.Frame = new CGRect(0, 0, 32, 32);
             closeBarButton.ImageView.ContentMode = UIViewContentMode.ScaleAspectFit;
             closeBarButton.Layer.CornerRadius = 16;

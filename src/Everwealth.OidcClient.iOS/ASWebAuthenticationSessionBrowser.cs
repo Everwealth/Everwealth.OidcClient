@@ -1,4 +1,4 @@
-using AuthenticationServices;
+﻿using AuthenticationServices;
 using Foundation;
 using IdentityModel.OidcClient.Browser;
 using System.Threading.Tasks;
