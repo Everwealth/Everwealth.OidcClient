@@ -16,8 +16,13 @@
     </dependencies>
   </metadata>
   <files>
+    <!--Portable-->
     <file src="..\src\Everwealth.OidcClient.Core\bin\Release\netstandard2.0\Everwealth.OidcClient.Core.dll" target="lib\netstandard2.0" />
+    <!--Android-->
+    <file src="..\src\Everwealth.OidcClient.Android\bin\Release\Everwealth.OidcClient.Core.dll" target="lib\MonoAndroid10" />
     <file src="..\src\Everwealth.OidcClient.Android\bin\Release\Everwealth.OidcClient.Android.dll" target="lib\MonoAndroid10" />
+    <!--iOS-->
+    <file src="..\src\Everwealth.OidcClient.iOS\bin\Release\Everwealth.OidcClient.Core.dll" target="lib\xamarinios10" />
     <file src="..\src\Everwealth.OidcClient.iOS\bin\Release\Everwealth.OidcClient.iOS.dll" target="lib\xamarinios10" />
     <file src="..\src\Everwealth.OidcClient.iOS\Resources\*.png" target="content\xamarinios10\Resources" />
   </files>
