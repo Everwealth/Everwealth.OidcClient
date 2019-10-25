@@ -14,7 +14,7 @@ namespace Everwealth.OidcClient
     {
         private readonly OidcClientOptions _options;
         private IdentityModel.OidcClient.OidcClient _oidcClient;
-        private IdentityModel.OidcClient.OidcClient OidcClient
+        protected IdentityModel.OidcClient.OidcClient OidcClient
         {
             get
             {

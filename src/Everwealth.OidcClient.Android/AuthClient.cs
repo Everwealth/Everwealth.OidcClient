@@ -55,6 +55,11 @@ namespace Everwealth.OidcClient
             options.PostLogoutRedirectUri = options.PostLogoutRedirectUri ?? defaultRedirectUri;
         }
 
+        public void SetCurrentActivity(Activity activity)
+        {
+            OidcClient.Options.Browser = new AutoSelectBrowser(activity);
+        }
+
         /// <summary>
         /// Attempt to find the right <see cref="IntentFilterAttribute"/> for the given
         /// <see cref="Activity"/>.
