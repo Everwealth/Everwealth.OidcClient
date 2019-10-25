@@ -26,7 +26,8 @@ namespace Everwealth.OidcClient
         /// <inheritdoc/>
         protected override void OpenBrowser(Android.Net.Uri uri, Context context = null)
         {
-            using (var builder = new CustomTabsIntent.Builder(_customTabsServiceConnection.Session))
+            //using (var builder = new CustomTabsIntent.Builder(_customTabsServiceConnection.Session))
+            using (var builder = new CustomTabsIntent.Builder())
             using (var customTabsIntent = builder.Build())
             {
                 customTabsIntent.Intent.AddFlags(ActivityFlags.NoHistory);
