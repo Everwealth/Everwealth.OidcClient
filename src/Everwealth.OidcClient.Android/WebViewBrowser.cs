@@ -49,15 +49,13 @@ namespace Everwealth.OidcClient
             SetContentView(Resource.Layout.activity_webview);
             string url = Intent.GetStringExtra(EXTRA_URL);
             WebView webView = FindViewById<WebView>(Resource.Id.webview);
-            webView.SetWebViewClient(new WebViewClient());
+            webView.SetWebViewClient(new CsutomSchemeWebViewClient());
             WebSettings webSettings = webView.Settings;
             webSettings.JavaScriptEnabled = true;
             Title = "";
             ActionBar.SetDisplayHomeAsUpEnabled(true);
             ActionBar.SetHomeAsUpIndicator(Resource.Drawable.ic_close_black_24dp);
             webView.LoadUrl(url);
-
-            return;
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -70,6 +68,19 @@ namespace Everwealth.OidcClient
                     return true;
             }
             return base.OnOptionsItemSelected(item);
+        }
+
+        public class CsutomSchemeWebViewClient : WebViewClient
+        {
+            public override bool ShouldOverrideUrlLoading(WebView view, IWebResourceRequest request)
+            {
+                if (request?.Url != null && request.Url.Scheme != "http" && request.Url.Scheme != "https")
+                {
+                    ActivityMediator.Instance.Send(request.Url.ToString());
+                    return true;
+                }
+                return base.ShouldOverrideUrlLoading(view, request);
+            }
         }
     }
 }
