@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using IdentityModel.OidcClient;
+using IdentityModel.OidcClient.Browser;
 using System;
 using System.Linq;
 
@@ -55,9 +56,9 @@ namespace Everwealth.OidcClient
             options.PostLogoutRedirectUri = options.PostLogoutRedirectUri ?? defaultRedirectUri;
         }
 
-        public void SetCurrentActivity(Activity activity)
+        public void SetBrowser(IBrowser browser)
         {
-            OidcClient.Options.Browser = new AutoSelectBrowser(activity);
+            OidcClient.Options.Browser = browser;
         }
 
         /// <summary>
