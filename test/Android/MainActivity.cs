@@ -14,8 +14,8 @@ namespace AndroidTestApp
         new[] { Intent.ActionView },
         Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
         DataScheme = "com.everwealth.app",
-        DataHost = "",
-        DataPathPrefix = "/auth/callback")]
+        DataHost = "auth",
+        DataPathPrefix = "/callback")]
     public class MainActivity : AuthClientActivity
     {
         private AuthClient _authClient;
@@ -31,10 +31,11 @@ namespace AndroidTestApp
             _authClient = new AuthClient(new OidcClientOptions
             {
                 //Authority = Resources.GetString(Resource.String.auth0_domain),
-                Authority = "",
-                ClientId = "",
+                Authority = "https://everwealth-stg-sa-idn.azurewebsites.net",
+                ClientId = "everwealth.android",
                 Scope = "openid",
                 RedirectUri = "com.everwealth.app://auth/callback",
+                Browser = new WebViewBrowser(this)
             }, this);
 
             SetContentView(Resource.Layout.Main);

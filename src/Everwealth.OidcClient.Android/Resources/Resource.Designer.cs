@@ -226,40 +226,43 @@ namespace Everwealth.OidcClient
 		{
 			
 			// aapt resource value: 0x7F040000
-			public static int notification_action_background = 2130968576;
+			public static int ic_close_black_24dp = 2130968576;
 			
 			// aapt resource value: 0x7F040001
-			public static int notification_bg = 2130968577;
+			public static int notification_action_background = 2130968577;
 			
 			// aapt resource value: 0x7F040002
-			public static int notification_bg_low = 2130968578;
+			public static int notification_bg = 2130968578;
 			
 			// aapt resource value: 0x7F040003
-			public static int notification_bg_low_normal = 2130968579;
+			public static int notification_bg_low = 2130968579;
 			
 			// aapt resource value: 0x7F040004
-			public static int notification_bg_low_pressed = 2130968580;
+			public static int notification_bg_low_normal = 2130968580;
 			
 			// aapt resource value: 0x7F040005
-			public static int notification_bg_normal = 2130968581;
+			public static int notification_bg_low_pressed = 2130968581;
 			
 			// aapt resource value: 0x7F040006
-			public static int notification_bg_normal_pressed = 2130968582;
+			public static int notification_bg_normal = 2130968582;
 			
 			// aapt resource value: 0x7F040007
-			public static int notification_icon_background = 2130968583;
+			public static int notification_bg_normal_pressed = 2130968583;
 			
 			// aapt resource value: 0x7F040008
-			public static int notification_template_icon_bg = 2130968584;
+			public static int notification_icon_background = 2130968584;
 			
 			// aapt resource value: 0x7F040009
-			public static int notification_template_icon_low_bg = 2130968585;
+			public static int notification_template_icon_bg = 2130968585;
 			
 			// aapt resource value: 0x7F04000A
-			public static int notification_tile_bg = 2130968586;
+			public static int notification_template_icon_low_bg = 2130968586;
 			
 			// aapt resource value: 0x7F04000B
-			public static int notify_panel_notification_icon_bg = 2130968587;
+			public static int notification_tile_bg = 2130968587;
+			
+			// aapt resource value: 0x7F04000C
+			public static int notify_panel_notification_icon_bg = 2130968588;
 			
 			static Drawable()
 			{
@@ -421,6 +424,9 @@ namespace Everwealth.OidcClient
 			// aapt resource value: 0x7F050030
 			public static int top = 2131034160;
 			
+			// aapt resource value: 0x7F050031
+			public static int webview = 2131034161;
+			
 			static Id()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
@@ -451,28 +457,31 @@ namespace Everwealth.OidcClient
 		{
 			
 			// aapt resource value: 0x7F070000
-			public static int browser_actions_context_menu_page = 2131165184;
+			public static int activity_webview = 2131165184;
 			
 			// aapt resource value: 0x7F070001
-			public static int browser_actions_context_menu_row = 2131165185;
+			public static int browser_actions_context_menu_page = 2131165185;
 			
 			// aapt resource value: 0x7F070002
-			public static int notification_action = 2131165186;
+			public static int browser_actions_context_menu_row = 2131165186;
 			
 			// aapt resource value: 0x7F070003
-			public static int notification_action_tombstone = 2131165187;
+			public static int notification_action = 2131165187;
 			
 			// aapt resource value: 0x7F070004
-			public static int notification_template_custom_big = 2131165188;
+			public static int notification_action_tombstone = 2131165188;
 			
 			// aapt resource value: 0x7F070005
-			public static int notification_template_icon_group = 2131165189;
+			public static int notification_template_custom_big = 2131165189;
 			
 			// aapt resource value: 0x7F070006
-			public static int notification_template_part_chronometer = 2131165190;
+			public static int notification_template_icon_group = 2131165190;
 			
 			// aapt resource value: 0x7F070007
-			public static int notification_template_part_time = 2131165191;
+			public static int notification_template_part_chronometer = 2131165191;
+			
+			// aapt resource value: 0x7F070008
+			public static int notification_template_part_time = 2131165192;
 			
 			static Layout()
 			{

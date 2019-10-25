@@ -79,6 +79,7 @@ namespace AndroidTestApp
 			global::Everwealth.OidcClient.Resource.Dimension.notification_subtext_size = global::AndroidTestApp.Resource.Dimension.notification_subtext_size;
 			global::Everwealth.OidcClient.Resource.Dimension.notification_top_pad = global::AndroidTestApp.Resource.Dimension.notification_top_pad;
 			global::Everwealth.OidcClient.Resource.Dimension.notification_top_pad_large_text = global::AndroidTestApp.Resource.Dimension.notification_top_pad_large_text;
+			global::Everwealth.OidcClient.Resource.Drawable.ic_close_black_24dp = global::AndroidTestApp.Resource.Drawable.ic_close_black_24dp;
 			global::Everwealth.OidcClient.Resource.Drawable.notification_action_background = global::AndroidTestApp.Resource.Drawable.notification_action_background;
 			global::Everwealth.OidcClient.Resource.Drawable.notification_bg = global::AndroidTestApp.Resource.Drawable.notification_bg;
 			global::Everwealth.OidcClient.Resource.Drawable.notification_bg_low = global::AndroidTestApp.Resource.Drawable.notification_bg_low;
@@ -140,7 +141,9 @@ namespace AndroidTestApp
 			global::Everwealth.OidcClient.Resource.Id.time = global::AndroidTestApp.Resource.Id.time;
 			global::Everwealth.OidcClient.Resource.Id.title = global::AndroidTestApp.Resource.Id.title;
 			global::Everwealth.OidcClient.Resource.Id.top = global::AndroidTestApp.Resource.Id.top;
+			global::Everwealth.OidcClient.Resource.Id.webview = global::AndroidTestApp.Resource.Id.webview;
 			global::Everwealth.OidcClient.Resource.Integer.status_bar_notification_info_maxnum = global::AndroidTestApp.Resource.Integer.status_bar_notification_info_maxnum;
+			global::Everwealth.OidcClient.Resource.Layout.activity_webview = global::AndroidTestApp.Resource.Layout.activity_webview;
 			global::Everwealth.OidcClient.Resource.Layout.browser_actions_context_menu_page = global::AndroidTestApp.Resource.Layout.browser_actions_context_menu_page;
 			global::Everwealth.OidcClient.Resource.Layout.browser_actions_context_menu_row = global::AndroidTestApp.Resource.Layout.browser_actions_context_menu_row;
 			global::Everwealth.OidcClient.Resource.Layout.notification_action = global::AndroidTestApp.Resource.Layout.notification_action;
@@ -412,44 +415,47 @@ namespace AndroidTestApp
 		public partial class Drawable
 		{
 			
-			// aapt resource value: 0x7F040000
-			public const int Icon = 2130968576;
-			
 			// aapt resource value: 0x7F040001
-			public const int notification_action_background = 2130968577;
+			public const int Icon = 2130968577;
+			
+			// aapt resource value: 0x7F040000
+			public const int ic_close_black_24dp = 2130968576;
 			
 			// aapt resource value: 0x7F040002
-			public const int notification_bg = 2130968578;
+			public const int notification_action_background = 2130968578;
 			
 			// aapt resource value: 0x7F040003
-			public const int notification_bg_low = 2130968579;
+			public const int notification_bg = 2130968579;
 			
 			// aapt resource value: 0x7F040004
-			public const int notification_bg_low_normal = 2130968580;
+			public const int notification_bg_low = 2130968580;
 			
 			// aapt resource value: 0x7F040005
-			public const int notification_bg_low_pressed = 2130968581;
+			public const int notification_bg_low_normal = 2130968581;
 			
 			// aapt resource value: 0x7F040006
-			public const int notification_bg_normal = 2130968582;
+			public const int notification_bg_low_pressed = 2130968582;
 			
 			// aapt resource value: 0x7F040007
-			public const int notification_bg_normal_pressed = 2130968583;
+			public const int notification_bg_normal = 2130968583;
 			
 			// aapt resource value: 0x7F040008
-			public const int notification_icon_background = 2130968584;
+			public const int notification_bg_normal_pressed = 2130968584;
 			
 			// aapt resource value: 0x7F040009
-			public const int notification_template_icon_bg = 2130968585;
+			public const int notification_icon_background = 2130968585;
 			
 			// aapt resource value: 0x7F04000A
-			public const int notification_template_icon_low_bg = 2130968586;
+			public const int notification_template_icon_bg = 2130968586;
 			
 			// aapt resource value: 0x7F04000B
-			public const int notification_tile_bg = 2130968587;
+			public const int notification_template_icon_low_bg = 2130968587;
 			
 			// aapt resource value: 0x7F04000C
-			public const int notify_panel_notification_icon_bg = 2130968588;
+			public const int notification_tile_bg = 2130968588;
+			
+			// aapt resource value: 0x7F04000D
+			public const int notify_panel_notification_icon_bg = 2130968589;
 			
 			static Drawable()
 			{
@@ -626,6 +632,9 @@ namespace AndroidTestApp
 			// aapt resource value: 0x7F050003
 			public const int UserDetailsTextView = 2131034115;
 			
+			// aapt resource value: 0x7F050036
+			public const int webview = 2131034166;
+			
 			static Id()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
@@ -656,31 +665,34 @@ namespace AndroidTestApp
 		{
 			
 			// aapt resource value: 0x7F070000
-			public const int browser_actions_context_menu_page = 2131165184;
+			public const int activity_webview = 2131165184;
 			
 			// aapt resource value: 0x7F070001
-			public const int browser_actions_context_menu_row = 2131165185;
+			public const int browser_actions_context_menu_page = 2131165185;
 			
 			// aapt resource value: 0x7F070002
-			public const int Main = 2131165186;
+			public const int browser_actions_context_menu_row = 2131165186;
 			
 			// aapt resource value: 0x7F070003
-			public const int notification_action = 2131165187;
+			public const int Main = 2131165187;
 			
 			// aapt resource value: 0x7F070004
-			public const int notification_action_tombstone = 2131165188;
+			public const int notification_action = 2131165188;
 			
 			// aapt resource value: 0x7F070005
-			public const int notification_template_custom_big = 2131165189;
+			public const int notification_action_tombstone = 2131165189;
 			
 			// aapt resource value: 0x7F070006
-			public const int notification_template_icon_group = 2131165190;
+			public const int notification_template_custom_big = 2131165190;
 			
 			// aapt resource value: 0x7F070007
-			public const int notification_template_part_chronometer = 2131165191;
+			public const int notification_template_icon_group = 2131165191;
 			
 			// aapt resource value: 0x7F070008
-			public const int notification_template_part_time = 2131165192;
+			public const int notification_template_part_chronometer = 2131165192;
+			
+			// aapt resource value: 0x7F070009
+			public const int notification_template_part_time = 2131165193;
 			
 			static Layout()
 			{
