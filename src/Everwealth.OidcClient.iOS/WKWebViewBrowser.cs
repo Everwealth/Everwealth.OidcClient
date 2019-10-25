@@ -96,10 +96,11 @@ namespace Everwealth.OidcClient
             NavigationController.NavigationBar.ShadowImage = new UIImage();
             NavigationController.NavigationBar.Translucent = true;
 
-
             _activityIndicatorView = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray);
             _activityIndicatorView.HidesWhenStopped = true;
             WebView.AddSubview(_activityIndicatorView);
+            _activityIndicatorView.StartAnimating();
+            _activityIndicatorView.Alpha = 0;
         }
 
         public override void LoadView()
@@ -111,7 +112,10 @@ namespace Everwealth.OidcClient
         {
             base.ViewDidAppear(animated);
             _activityIndicatorView.Center = View.Center;
-            _activityIndicatorView.StartAnimating();
+            UIView.Animate(0.15, () =>
+            {
+                _activityIndicatorView.Alpha = 1;
+            });
         }
 
         private async void Cancelled(object sender, EventArgs e)
@@ -120,12 +124,12 @@ namespace Everwealth.OidcClient
             await NavigationController.DismissViewControllerAsync(true);
         }
 
-        [Export("webView:didStartProvisionalNavigation:")]
-        public void DidStartProvisionalNavigation(WKWebView webView, WKNavigation navigation)
-        {
-            _activityIndicatorView.Center = View.Center;
-            _activityIndicatorView.StartAnimating();
-        }
+        //[Export("webView:didStartProvisionalNavigation:")]
+        //public void DidStartProvisionalNavigation(WKWebView webView, WKNavigation navigation)
+        //{
+        //    _activityIndicatorView.Center = View.Center;
+        //    _activityIndicatorView.StartAnimating();
+        //}
 
         [Export("webView:didFinishNavigation:")]
         public void DidFinishNavigation(WKWebView webView, WKNavigation navigation)

@@ -24,8 +24,8 @@ namespace iOSTestApp
             {
                 Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
                 ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect,
-                Authority = "https://everwealth-stg-sa-idn.azurewebsites.net",
-                ClientId = "everwealth.ios",
+                Authority = "",
+                ClientId = "",
                 Scope = "openid",
                 RedirectUri = "com.everwealth.app://auth/callback",
                 Browser = new WKWebViewBrowser()

@@ -13,9 +13,9 @@ namespace AndroidTestApp
     [IntentFilter(
         new[] { Intent.ActionView },
         Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
-        DataScheme = "androidtestapp.androidtestapp",
-        DataHost = "@string/auth0_domain",
-        DataPathPrefix = "/android/AndroidTestApp.AndroidTestApp/callback")]
+        DataScheme = "com.everwealth.app",
+        DataHost = "",
+        DataPathPrefix = "/auth/callback")]
     public class MainActivity : AuthClientActivity
     {
         private AuthClient _authClient;
@@ -30,9 +30,11 @@ namespace AndroidTestApp
 
             _authClient = new AuthClient(new OidcClientOptions
             {
-                Authority = Resources.GetString(Resource.String.auth0_domain),
-                ClientId = "qmss9A66stPWTOXjR6X1OeA0DLadoNP2",
-                Scope = "openid profile email",
+                //Authority = Resources.GetString(Resource.String.auth0_domain),
+                Authority = "",
+                ClientId = "",
+                Scope = "openid",
+                RedirectUri = "com.everwealth.app://auth/callback",
             }, this);
 
             SetContentView(Resource.Layout.Main);
