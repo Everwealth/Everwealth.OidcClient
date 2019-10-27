@@ -47,6 +47,13 @@ namespace Everwealth.OidcClient
             base.OnCreate(savedInstanceState);
 
             SetContentView(Resource.Layout.activity_webview);
+
+            // Cookie settings
+            CookieSyncManager.CreateInstance(this);
+            var cookieManager = CookieManager.Instance;
+            cookieManager.RemoveAllCookie();
+            cookieManager.SetAcceptCookie(false);
+
             string url = Intent.GetStringExtra(EXTRA_URL);
             WebView webView = FindViewById<WebView>(Resource.Id.webview);
             webView.SetWebViewClient(new CsutomSchemeWebViewClient());
