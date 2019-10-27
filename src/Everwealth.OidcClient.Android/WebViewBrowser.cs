@@ -52,7 +52,7 @@ namespace Everwealth.OidcClient
             CookieSyncManager.CreateInstance(this);
             var cookieManager = CookieManager.Instance;
             cookieManager.RemoveAllCookie();
-            cookieManager.SetAcceptCookie(false);
+            //cookieManager.SetAcceptCookie(false);
 
             string url = Intent.GetStringExtra(EXTRA_URL);
             WebView webView = FindViewById<WebView>(Resource.Id.webview);
