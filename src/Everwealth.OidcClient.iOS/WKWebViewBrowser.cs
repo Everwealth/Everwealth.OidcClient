@@ -68,11 +68,14 @@ namespace Everwealth.OidcClient
     {
         public WKWebView WebView { get; set; }
         private UIActivityIndicatorView _activityIndicatorView;
+        private string _endUrlScheme;
 
         public WKWebViewController(NSUrl startUrl, NSUrl endUrl)
         {
+            _endUrlScheme = endUrl.Scheme;
+
             var webViewConfig = new WKWebViewConfiguration();
-            webViewConfig.SetUrlSchemeHandler(new CallbackHandler(), endUrl.Scheme);
+            //webViewConfig.SetUrlSchemeHandler(new CallbackHandler(), endUrl.Scheme);
             WebView = new WKWebView(new CGRect(0, 0, 0, 0), webViewConfig);
             WebView.LoadRequest(new NSUrlRequest(startUrl));
             WebView.WeakNavigationDelegate = this;
@@ -131,6 +134,18 @@ namespace Everwealth.OidcClient
         //    _activityIndicatorView.StartAnimating();
         //}
 
+        [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
+        public void DecidePolicy(WKWebView webView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
+        {
+            if (navigationAction.Request?.Url is NSUrl url && url.Scheme == _endUrlScheme)
+            {
+                
+                Console.WriteLine("Policy Decision: Handled callback with URL {0}", url);
+                ActivityMediator.Instance.Send(url.AbsoluteString);
+            }
+            decisionHandler(WKNavigationActionPolicy.Allow);
+        }
+
         [Export("webView:didFinishNavigation:")]
         public void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
         {
@@ -149,6 +164,7 @@ namespace Everwealth.OidcClient
         {
             public void StartUrlSchemeTask(WKWebView webView, IWKUrlSchemeTask urlSchemeTask)
             {
+                Console.WriteLine("Callback Handler: Handled callback with URL {0}", urlSchemeTask.Request.Url);
                 ActivityMediator.Instance.Send(urlSchemeTask.Request.Url.AbsoluteString);
             }
 
@@ -158,4 +174,20 @@ namespace Everwealth.OidcClient
             }
         }
     }
+
+    //public class WKCookieWebView : WKWebView
+    //{
+    //    public override WKNavigation LoadRequest(NSUrlRequest request)
+    //    {
+    //        return base.LoadRequest(request);
+    //    }
+
+    //    private bool RequestWithCookieHandling(NSUrlRequest request)
+    //    {
+    //        var sessionConfig = NSUrlSessionConfiguration.DefaultSessionConfiguration;
+    //        var session = NSUrlSession.FromConfiguration(sessionConfig);
+
+    //        var task = session.CreateDataTask(request, new NSUrlSessionResponse();
+    //    }
+    //}
 }
