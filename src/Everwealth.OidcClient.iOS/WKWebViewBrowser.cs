@@ -72,7 +72,7 @@ namespace Everwealth.OidcClient
             return true;
         }
 
-        public override void WillDismiss(UIPresentationController presentationController)
+        public override void DidDismiss(UIPresentationController presentationController)
         {
             ActivityMediator.Instance.Cancel();
         }
