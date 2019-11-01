@@ -28,6 +28,7 @@ namespace Everwealth.OidcClient
             {
                 ModalPresentationStyle = UIModalPresentationStyle.FormSheet,
             });
+            browserController.PresentationController.Delegate = new DismissablePresentationControllerDelegate();
 
             async void Callback(string response)
             {
@@ -61,6 +62,19 @@ namespace Everwealth.OidcClient
             while (vc.PresentedViewController != null)
                 vc = vc.PresentedViewController;
             return vc;
+        }
+    }
+
+    public class DismissablePresentationControllerDelegate : UIAdaptivePresentationControllerDelegate
+    {
+        public override bool ShouldDismiss(UIPresentationController presentationController)
+        {
+            return true;
+        }
+
+        public override void WillDismiss(UIPresentationController presentationController)
+        {
+            ActivityMediator.Instance.Cancel();
         }
     }
 
@@ -123,7 +137,7 @@ namespace Everwealth.OidcClient
 
         private async void Cancelled(object sender, EventArgs e)
         {
-            ActivityMediator.Instance.Send("UserCancel");
+            ActivityMediator.Instance.Cancel();
             await NavigationController.DismissViewControllerAsync(true);
         }
 
