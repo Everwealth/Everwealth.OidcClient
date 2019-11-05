@@ -1,7 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WebView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/webview"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="Android.Support.CustomTabs.Chromium.SharedUtilities.WebViewActivity" />
+    android:layout_height="match_parent">
+    <WebView 
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="Android.Support.CustomTabs.Chromium.SharedUtilities.WebViewActivity" />
+	<ProgressBar
+		android:layout_width="50dp"
+		android:layout_height="50dp"
+        android:layout_gravity="center"
+		android:id="@+id/progressBar" />
+</FrameLayout>

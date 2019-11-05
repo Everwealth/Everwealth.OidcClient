@@ -82,8 +82,7 @@ namespace Everwealth.OidcClient
     {
         public WKWebView WebView { get; set; }
         private UIActivityIndicatorView _activityIndicatorView;
-        private string _endUrlScheme;
-
+        private readonly string _endUrlScheme;
         public WKWebViewController(NSUrl startUrl, NSUrl endUrl)
         {
             _endUrlScheme = endUrl.Scheme;
@@ -118,6 +117,15 @@ namespace Everwealth.OidcClient
             WebView.AddSubview(_activityIndicatorView);
             _activityIndicatorView.StartAnimating();
             _activityIndicatorView.Alpha = 0;
+
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+            {
+                var safeView = new UIView(new CGRect(0, 0, UIApplication.SharedApplication.StatusBarFrame.Size.Width, UIApplication.SharedApplication.StatusBarFrame.Size.Height))
+                {
+                    BackgroundColor = UIColor.White
+                };
+                this.Add(safeView);
+            }
         }
 
         public override void LoadView()

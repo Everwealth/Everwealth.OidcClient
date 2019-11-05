@@ -389,43 +389,46 @@ namespace Everwealth.OidcClient
 			public static int notification_main_column_container = 2131034148;
 			
 			// aapt resource value: 0x7F050025
-			public static int right = 2131034149;
+			public static int progressBar = 2131034149;
 			
 			// aapt resource value: 0x7F050026
-			public static int right_icon = 2131034150;
+			public static int right = 2131034150;
 			
 			// aapt resource value: 0x7F050027
-			public static int right_side = 2131034151;
+			public static int right_icon = 2131034151;
 			
 			// aapt resource value: 0x7F050028
-			public static int start = 2131034152;
+			public static int right_side = 2131034152;
 			
 			// aapt resource value: 0x7F050029
-			public static int tag_transition_group = 2131034153;
+			public static int start = 2131034153;
 			
 			// aapt resource value: 0x7F05002A
-			public static int tag_unhandled_key_event_manager = 2131034154;
+			public static int tag_transition_group = 2131034154;
 			
 			// aapt resource value: 0x7F05002B
-			public static int tag_unhandled_key_listeners = 2131034155;
+			public static int tag_unhandled_key_event_manager = 2131034155;
 			
 			// aapt resource value: 0x7F05002C
-			public static int text = 2131034156;
+			public static int tag_unhandled_key_listeners = 2131034156;
 			
 			// aapt resource value: 0x7F05002D
-			public static int text2 = 2131034157;
+			public static int text = 2131034157;
 			
 			// aapt resource value: 0x7F05002E
-			public static int time = 2131034158;
+			public static int text2 = 2131034158;
 			
 			// aapt resource value: 0x7F05002F
-			public static int title = 2131034159;
+			public static int time = 2131034159;
 			
 			// aapt resource value: 0x7F050030
-			public static int top = 2131034160;
+			public static int title = 2131034160;
 			
 			// aapt resource value: 0x7F050031
-			public static int webview = 2131034161;
+			public static int top = 2131034161;
+			
+			// aapt resource value: 0x7F050032
+			public static int webview = 2131034162;
 			
 			static Id()
 			{

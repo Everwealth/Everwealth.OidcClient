@@ -4,6 +4,7 @@ using Android.Content;
 using Android.OS;
 using Android.Views;
 using Android.Webkit;
+using Android.Widget;
 
 namespace Everwealth.OidcClient
 {
@@ -56,7 +57,8 @@ namespace Everwealth.OidcClient
 
             string url = Intent.GetStringExtra(EXTRA_URL);
             WebView webView = FindViewById<WebView>(Resource.Id.webview);
-            webView.SetWebViewClient(new CsutomSchemeWebViewClient());
+            ProgressBar progressDialog = FindViewById<ProgressBar>(Resource.Id.progressBar);
+            webView.SetWebViewClient(new CustomSchemeWebViewClient(progressDialog));
             WebSettings webSettings = webView.Settings;
             webSettings.JavaScriptEnabled = true;
             Title = "";
@@ -77,8 +79,14 @@ namespace Everwealth.OidcClient
             return base.OnOptionsItemSelected(item);
         }
 
-        public class CsutomSchemeWebViewClient : WebViewClient
+        public class CustomSchemeWebViewClient : WebViewClient
         {
+            private readonly ProgressBar _progressDialog;
+            public CustomSchemeWebViewClient(ProgressBar progressDialog)
+            {
+                _progressDialog = progressDialog;
+            }
+
             public override bool ShouldOverrideUrlLoading(WebView view, IWebResourceRequest request)
             {
                 if (request?.Url != null && request.Url.Scheme != "http" && request.Url.Scheme != "https")
@@ -86,7 +94,14 @@ namespace Everwealth.OidcClient
                     ActivityMediator.Instance.Send(request.Url.ToString());
                     return true;
                 }
+                _progressDialog.Visibility = ViewStates.Visible;
                 return base.ShouldOverrideUrlLoading(view, request);
+            }
+
+            public override void OnPageFinished(WebView view, string url)
+            {
+                base.OnPageFinished(view, url);
+                _progressDialog.Visibility = ViewStates.Invisible;
             }
         }
     }
