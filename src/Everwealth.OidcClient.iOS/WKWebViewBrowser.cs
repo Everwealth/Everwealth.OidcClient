@@ -182,7 +182,7 @@ namespace Everwealth.OidcClient
                 }
                 else if (_options.RestartFlowRoutes is string[] restartRoutes
                     && url.Host == new NSUrl(_options.StartUrl).Host
-                    && string.IsNullOrEmpty(url.ParameterString)
+                    && string.IsNullOrEmpty(url.Query)
                     && restartRoutes.Contains(url.Path, StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
