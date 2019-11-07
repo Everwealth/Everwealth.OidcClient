@@ -129,6 +129,7 @@ namespace AndroidTestApp
 			global::Everwealth.OidcClient.Resource.Id.notification_background = global::AndroidTestApp.Resource.Id.notification_background;
 			global::Everwealth.OidcClient.Resource.Id.notification_main_column = global::AndroidTestApp.Resource.Id.notification_main_column;
 			global::Everwealth.OidcClient.Resource.Id.notification_main_column_container = global::AndroidTestApp.Resource.Id.notification_main_column_container;
+			global::Everwealth.OidcClient.Resource.Id.progressBar = global::AndroidTestApp.Resource.Id.progressBar;
 			global::Everwealth.OidcClient.Resource.Id.right = global::AndroidTestApp.Resource.Id.right;
 			global::Everwealth.OidcClient.Resource.Id.right_icon = global::AndroidTestApp.Resource.Id.right_icon;
 			global::Everwealth.OidcClient.Resource.Id.right_side = global::AndroidTestApp.Resource.Id.right_side;
@@ -591,40 +592,43 @@ namespace AndroidTestApp
 			public const int notification_main_column_container = 2131034153;
 			
 			// aapt resource value: 0x7F05002A
-			public const int right = 2131034154;
+			public const int progressBar = 2131034154;
 			
 			// aapt resource value: 0x7F05002B
-			public const int right_icon = 2131034155;
+			public const int right = 2131034155;
 			
 			// aapt resource value: 0x7F05002C
-			public const int right_side = 2131034156;
+			public const int right_icon = 2131034156;
 			
 			// aapt resource value: 0x7F05002D
-			public const int start = 2131034157;
+			public const int right_side = 2131034157;
 			
 			// aapt resource value: 0x7F05002E
-			public const int tag_transition_group = 2131034158;
+			public const int start = 2131034158;
 			
 			// aapt resource value: 0x7F05002F
-			public const int tag_unhandled_key_event_manager = 2131034159;
+			public const int tag_transition_group = 2131034159;
 			
 			// aapt resource value: 0x7F050030
-			public const int tag_unhandled_key_listeners = 2131034160;
+			public const int tag_unhandled_key_event_manager = 2131034160;
 			
 			// aapt resource value: 0x7F050031
-			public const int text = 2131034161;
+			public const int tag_unhandled_key_listeners = 2131034161;
 			
 			// aapt resource value: 0x7F050032
-			public const int text2 = 2131034162;
+			public const int text = 2131034162;
 			
 			// aapt resource value: 0x7F050033
-			public const int time = 2131034163;
+			public const int text2 = 2131034163;
 			
 			// aapt resource value: 0x7F050034
-			public const int title = 2131034164;
+			public const int time = 2131034164;
 			
 			// aapt resource value: 0x7F050035
-			public const int top = 2131034165;
+			public const int title = 2131034165;
+			
+			// aapt resource value: 0x7F050036
+			public const int top = 2131034166;
 			
 			// aapt resource value: 0x7F050002
 			public const int UserButton = 2131034114;
@@ -632,8 +636,8 @@ namespace AndroidTestApp
 			// aapt resource value: 0x7F050003
 			public const int UserDetailsTextView = 2131034115;
 			
-			// aapt resource value: 0x7F050036
-			public const int webview = 2131034166;
+			// aapt resource value: 0x7F050037
+			public const int webview = 2131034167;
 			
 			static Id()
 			{

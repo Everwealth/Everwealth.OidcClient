@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
@@ -13,18 +15,28 @@ namespace Everwealth.OidcClient
     /// </summary>
     public class WKWebViewBrowser : IOSBrowserBase
     {
+        private string[] _restartFlowRoutes;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="restartFlowRoutes">If one of these routes is hit after the initial request, the flow will be restarted. Routes should be formatted excluding the domain eg. /signin</param>
+        public WKWebViewBrowser(string[] restartFlowRoutes = null)
+        {
+            _restartFlowRoutes = restartFlowRoutes;
+        }
+
         /// <inheritdoc/>
         protected override Task<BrowserResult> Launch(BrowserOptions options)
         {
-            return Start(options);
+            return Start(new ExtendedBrowserOptions(options.StartUrl, options.EndUrl, _restartFlowRoutes));
         }
 
-        internal static Task<BrowserResult> Start(BrowserOptions options)
+        internal static Task<BrowserResult> Start(ExtendedBrowserOptions options)
         {
             var tcs = new TaskCompletionSource<BrowserResult>();
 
             // Create web view controller
-            var browserController = new UINavigationController(new WKWebViewController(new NSUrl(options.StartUrl), new NSUrl(options.EndUrl))
+            var browserController = new UINavigationController(new WKWebViewController(options)
             {
                 ModalPresentationStyle = UIModalPresentationStyle.FormSheet,
             });
@@ -38,6 +50,15 @@ namespace Everwealth.OidcClient
                 {
                     BrowserMediator.Instance.Cancel();
                     tcs.SetResult(Canceled());
+                }
+                else if (response == "RestartFlow")
+                {
+                    // Close existing
+                    await browserController.DismissViewControllerAsync(true); // Close web view
+                    browserController.Dispose();
+
+                    // Launch new
+                    FindRootController().PresentViewController(browserController, true, null);
                 }
                 else
                 {
@@ -82,15 +103,15 @@ namespace Everwealth.OidcClient
     {
         public WKWebView WebView { get; set; }
         private UIActivityIndicatorView _activityIndicatorView;
-        private readonly string _endUrlScheme;
-        public WKWebViewController(NSUrl startUrl, NSUrl endUrl)
+        private readonly ExtendedBrowserOptions _options;
+        public WKWebViewController(ExtendedBrowserOptions options)
         {
-            _endUrlScheme = endUrl.Scheme;
+            _options = options;
 
             var webViewConfig = new WKWebViewConfiguration();
             //webViewConfig.SetUrlSchemeHandler(new CallbackHandler(), endUrl.Scheme);
             WebView = new WKWebView(new CGRect(0, 0, 0, 0), webViewConfig);
-            WebView.LoadRequest(new NSUrlRequest(startUrl));
+            WebView.LoadRequest(new NSUrlRequest(new NSUrl(options.StartUrl)));
             WebView.WeakNavigationDelegate = this;
         }
 
@@ -149,21 +170,23 @@ namespace Everwealth.OidcClient
             await NavigationController.DismissViewControllerAsync(true);
         }
 
-        //[Export("webView:didStartProvisionalNavigation:")]
-        //public void DidStartProvisionalNavigation(WKWebView webView, WKNavigation navigation)
-        //{
-        //    _activityIndicatorView.Center = View.Center;
-        //    _activityIndicatorView.StartAnimating();
-        //}
-
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
         public void DecidePolicy(WKWebView webView, WKNavigationAction navigationAction, Action<WKNavigationActionPolicy> decisionHandler)
         {
-            if (navigationAction.Request?.Url is NSUrl url && url.Scheme == _endUrlScheme)
+            if (navigationAction.Request?.Url is NSUrl url)
             {
-                
-                Console.WriteLine("Policy Decision: Handled callback with URL {0}", url);
-                ActivityMediator.Instance.Send(url.AbsoluteString);
+                if (url.Scheme == new NSUrl(_options.EndUrl).Scheme)
+                {
+                    Console.WriteLine("Policy Decision: Handled callback with URL {0}", url);
+                    ActivityMediator.Instance.Send(url.AbsoluteString);
+                }
+                else if (_options.RestartFlowRoutes is string[] restartRoutes
+                    && url.Host == new NSUrl(_options.StartUrl).Host
+                    && restartRoutes.Contains(url.Path, StringComparer.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
+                    WebView.LoadRequest(new NSUrlRequest(new NSUrl(_options.StartUrl)));
+                }
             }
             decisionHandler(WKNavigationActionPolicy.Allow);
         }
@@ -196,20 +219,4 @@ namespace Everwealth.OidcClient
             }
         }
     }
-
-    //public class WKCookieWebView : WKWebView
-    //{
-    //    public override WKNavigation LoadRequest(NSUrlRequest request)
-    //    {
-    //        return base.LoadRequest(request);
-    //    }
-
-    //    private bool RequestWithCookieHandling(NSUrlRequest request)
-    //    {
-    //        var sessionConfig = NSUrlSessionConfiguration.DefaultSessionConfiguration;
-    //        var session = NSUrlSession.FromConfiguration(sessionConfig);
-
-    //        var task = session.CreateDataTask(request, new NSUrlSessionResponse();
-    //    }
-    //}
 }

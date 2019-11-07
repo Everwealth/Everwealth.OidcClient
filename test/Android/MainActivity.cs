@@ -31,11 +31,11 @@ namespace AndroidTestApp
             _authClient = new AuthClient(new OidcClientOptions
             {
                 //Authority = Resources.GetString(Resource.String.auth0_domain),
-                Authority = "https://everwealth-stg-sa-idn.azurewebsites.net",
-                ClientId = "everwealth.android",
-                Scope = "openid",
-                RedirectUri = "com.everwealth.app://auth/callback",
-                Browser = new WebViewBrowser(this)
+                Authority = "",
+                ClientId = "",
+                Scope = "",
+                RedirectUri = "",
+                Browser = new WebViewBrowser(this, new string[] { "/signin", "/" })
             }, this);
 
             SetContentView(Resource.Layout.Main);

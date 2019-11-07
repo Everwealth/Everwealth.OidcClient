@@ -1,5 +1,6 @@
 ﻿using IdentityModel.OidcClient.Browser;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Everwealth.OidcClient
@@ -17,7 +18,7 @@ namespace Everwealth.OidcClient
 
             if (string.IsNullOrWhiteSpace(options.EndUrl))
                 throw new ArgumentException("Missing EndUrl", nameof(options));
-
+            
             return Launch(options);
         }
 

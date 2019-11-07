@@ -26,9 +26,9 @@ namespace iOSTestApp
                 ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect,
                 Authority = "",
                 ClientId = "",
-                Scope = "openid",
-                RedirectUri = "com.everwealth.app://auth/callback",
-                Browser = new WKWebViewBrowser()
+                Scope = "",
+                RedirectUri = "",
+                Browser = new WKWebViewBrowser(new string[] { "/signin", "/" })
             });
 
             LoginButton.Clicked += Login;
