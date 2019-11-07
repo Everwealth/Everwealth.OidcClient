@@ -118,6 +118,7 @@ namespace Everwealth.OidcClient
                     }
                     else if (_restartPaths is string[] restartPaths
                         && url.Host == _startUrl.Host
+                        && string.IsNullOrEmpty(url.Query)
                         && restartPaths.Contains(url.Path, StringComparer.OrdinalIgnoreCase))
                     {
                         Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
