@@ -2,7 +2,11 @@
 using System.Linq;
 using Android.App;
 using Android.Content;
+using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.OS;
+using Android.Support.V4.Content;
+using Android.Support.V4.Graphics.Drawable;
 using Android.Views;
 using Android.Webkit;
 using Android.Widget;
@@ -65,13 +69,21 @@ namespace Everwealth.OidcClient
             string[] restartPaths = Intent.GetStringArrayExtra(RESTART_PATHS);
             WebView webView = FindViewById<WebView>(Resource.Id.webview);
             ProgressBar progressDialog = FindViewById<ProgressBar>(Resource.Id.progressBar);
-            webView.SetWebViewClient(new CustomSchemeWebViewClient(webView, progressDialog, url, restartPaths));
+            var webViewClient = new CustomSchemeWebViewClient(webView, progressDialog, url, restartPaths, OnSuccessLogin);
+            webView.SetWebViewClient(webViewClient);
+            
             WebSettings webSettings = webView.Settings;
             webSettings.JavaScriptEnabled = true;
             Title = "";
+            ActionBar.SetBackgroundDrawable(new ColorDrawable(Color.White));
             ActionBar.SetDisplayHomeAsUpEnabled(true);
             ActionBar.SetHomeAsUpIndicator(Resource.Drawable.ic_close_black_24dp);
             webView.LoadUrl(url);
+        }
+
+        private void OnSuccessLogin()
+        {
+            Finish();
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -92,12 +104,15 @@ namespace Everwealth.OidcClient
             private readonly ProgressBar _progressDialog;
             private readonly Uri _startUrl;
             private readonly string[] _restartPaths;
-            public CustomSchemeWebViewClient(WebView webView, ProgressBar progressDialog, string startUrl, string[] restartPaths)
+            private readonly Action _onSuccess;
+
+            public CustomSchemeWebViewClient(WebView webView, ProgressBar progressDialog, string startUrl, string[] restartPaths, Action onSuccess)
             {
                 _webView = webView;
                 _progressDialog = progressDialog;
                 _startUrl = new Uri(startUrl);
                 _restartPaths = restartPaths;
+                _onSuccess = onSuccess;
             }
 
             public override bool ShouldOverrideUrlLoading(WebView view, IWebResourceRequest request)
@@ -105,6 +120,7 @@ namespace Everwealth.OidcClient
                 if (request?.Url != null && request.Url.Scheme != "http" && request.Url.Scheme != "https")
                 {
                     ActivityMediator.Instance.Send(request.Url.ToString());
+                    _onSuccess?.Invoke();
                     return true;
                 }
 
@@ -114,6 +130,7 @@ namespace Everwealth.OidcClient
                     {
                         Console.WriteLine("URL loading overriden: Hit url {0}", url);
                         ActivityMediator.Instance.Send(request.Url.ToString());
+                        _onSuccess?.Invoke();
                         return true;
                     }
                     else if (_restartPaths is string[] restartPaths
