@@ -147,6 +147,37 @@ namespace Everwealth.OidcClient
                 return base.ShouldOverrideUrlLoading(view, request);
             }
 
+            public override bool ShouldOverrideUrlLoading(WebView view, string url)
+            {
+                var uri = Android.Net.Uri.Parse(url);
+                if (uri != null && uri.Scheme != "http" && uri.Scheme != "https")
+                {
+                    ActivityMediator.Instance.Send(uri.ToString());
+                    _onSuccess?.Invoke();
+                    return true;
+                }
+
+                if (uri.Scheme != "http" && uri.Scheme != "https")
+                {
+                    Console.WriteLine("URL loading overriden: Hit url {0}", url);
+                    ActivityMediator.Instance.Send(url);
+                    _onSuccess?.Invoke();
+                    return true;
+                }
+                else if (_restartPaths is string[] restartPaths
+                    && uri.Host == _startUrl.Host
+                    && string.IsNullOrEmpty(uri.Query)
+                    && restartPaths.Contains(uri.Path, StringComparer.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
+                    _webView.LoadUrl(_startUrl.ToString());
+                    return true;
+                }
+
+                _progressDialog.Visibility = ViewStates.Visible;
+                return base.ShouldOverrideUrlLoading(view, url);
+            }
+
             public override void OnPageFinished(WebView view, string url)
             {
                 base.OnPageFinished(view, url);
