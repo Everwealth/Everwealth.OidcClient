@@ -5,8 +5,6 @@ using Android.Content;
 using Android.Graphics;
 using Android.Graphics.Drawables;
 using Android.OS;
-using Android.Support.V4.Content;
-using Android.Support.V4.Graphics.Drawable;
 using Android.Views;
 using Android.Webkit;
 using Android.Widget;
@@ -45,12 +43,29 @@ namespace Everwealth.OidcClient
 
             context.StartActivity(intent);
         }
+
+        protected override void OpenBrowser(Android.Net.Uri startUri, Android.Net.Uri detouredUri, Context context = null)
+        {
+            var intent = new Intent(context, typeof(WebViewActivity));
+            intent.AddFlags(ActivityFlags.NoHistory);
+
+            if (IsNewTask)
+                intent.AddFlags(ActivityFlags.NewTask);
+
+            // Send uri through to activity
+            intent.PutExtra(WebViewActivity.EXTRA_URL, startUri.ToString());
+            intent.PutExtra(WebViewActivity.EXTRA_DETOUR_URL, detouredUri.ToString());
+            intent.PutExtra(WebViewActivity.RESTART_PATHS, _restartFlowRoutes);
+
+            context.StartActivity(intent);
+        }
     }
 
     [Activity(Theme = "@android:style/Theme.Material.Light")]
     public class WebViewActivity : Activity
     {
         public const string EXTRA_URL = "extra.url";
+        public const string EXTRA_DETOUR_URL = "extra.detoururl";
         public const string RESTART_PATHS = "restart.paths";
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -66,6 +81,7 @@ namespace Everwealth.OidcClient
             //cookieManager.SetAcceptCookie(false);
 
             string url = Intent.GetStringExtra(EXTRA_URL);
+            string detourUrl = Intent.GetStringExtra(EXTRA_DETOUR_URL);
             string[] restartPaths = Intent.GetStringArrayExtra(RESTART_PATHS);
             WebView webView = FindViewById<WebView>(Resource.Id.webview);
             ProgressBar progressDialog = FindViewById<ProgressBar>(Resource.Id.progressBar);
@@ -78,7 +94,7 @@ namespace Everwealth.OidcClient
             ActionBar.SetBackgroundDrawable(new ColorDrawable(Color.White));
             ActionBar.SetDisplayHomeAsUpEnabled(true);
             ActionBar.SetHomeAsUpIndicator(Resource.Drawable.ic_close_black_24dp);
-            webView.LoadUrl(url);
+            webView.LoadUrl(string.IsNullOrEmpty(detourUrl) ? url : detourUrl);
         }
 
         private void OnSuccessLogin()

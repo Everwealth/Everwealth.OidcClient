@@ -63,9 +63,9 @@ namespace Everwealth.OidcClient
         }
 
         /// <inheritdoc/>
-        public Task<LoginResult> ProcessResponseAsync(string data, AuthorizeState state)
+        public Task<LoginResult> ProcessResponseAsync(string data, AuthorizeState state, object extraParameters = null)
         {
-            return OidcClient.ProcessResponseAsync(data, state);
+            return OidcClient.ProcessResponseAsync(data, state, extraParameters);
         }
 
         /// <inheritdoc/>
@@ -84,6 +84,11 @@ namespace Everwealth.OidcClient
         public Task<UserInfoResult> GetUserInfoAsync(string accessToken)
         {
             return OidcClient.GetUserInfoAsync(accessToken);
+        }
+
+        public virtual Task<LoginResult> DetouredLoginAsync(string alternateUrl, LoginRequest request = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

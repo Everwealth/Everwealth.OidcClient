@@ -19,6 +19,14 @@ namespace Everwealth.OidcClient
         Task<LoginResult> LoginAsync(LoginRequest request = null);
 
         /// <summary>
+        /// Starts a session at the provided URL and starts a login if registered restart route is hit.
+        /// </summary>
+        /// <param name="alternateUrl">URL to be loaded.</param>
+        /// <param name="request">Request object.</param>
+        /// <returns>A <see cref="LoginResult"/> containing the tokens and claims.</returns>
+        Task<LoginResult> DetouredLoginAsync(string detourUrl, LoginRequest request = null);
+
+        /// <summary>
         /// Starts a logout.
         /// </summary>
         /// <param name="request">Request object.</param>
@@ -48,7 +56,7 @@ namespace Everwealth.OidcClient
         /// <param name="state">The <see cref="AuthorizeState"/> which was generated when the <see cref="PrepareLoginAsync"/>
         /// method was called.</param>
         /// <returns>A <see cref="LoginResult"/> containing the tokens and claims.</returns>
-        Task<LoginResult> ProcessResponseAsync(string data, AuthorizeState state);
+        Task<LoginResult> ProcessResponseAsync(string data, AuthorizeState state, object extraParameters = null);
 
         /// <summary>
         /// Generates a new set of tokens based on a refresh token. 
