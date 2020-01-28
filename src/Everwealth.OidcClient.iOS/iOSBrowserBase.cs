@@ -22,6 +22,18 @@ namespace Everwealth.OidcClient
             return Launch(options);
         }
 
+        /// <inheritdoc/>
+        public Task<BrowserResult> InvokeAsync(ExtendedBrowserOptions options)
+        {
+            if (string.IsNullOrWhiteSpace(options.StartUrl))
+                throw new ArgumentException("Missing StartUrl", nameof(options));
+
+            if (string.IsNullOrWhiteSpace(options.EndUrl))
+                throw new ArgumentException("Missing EndUrl", nameof(options));
+
+            return Launch(options);
+        }
+
         /// <summary>
         /// Launch a browser with the options and URL specified by the <see cref="BrowserOptions"/>.
         /// </summary>

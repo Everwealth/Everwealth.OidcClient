@@ -4,6 +4,7 @@ using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Browser;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Everwealth.OidcClient
 {
@@ -102,6 +103,50 @@ namespace Everwealth.OidcClient
             if (!value.StartsWith("@")) return value;
             var resourceId = context.Resources.GetIdentifier(value, null, context.PackageName);
             return resourceId > 0 ? context.Resources.GetString(resourceId) : value;
+        }
+
+        public override async Task<LoginResult> DetouredLoginAsync(string detourUrl, LoginRequest request = null)
+        {
+            if (request == null) request = new LoginRequest();
+
+            if (OidcClient.Options.Browser is WebViewBrowser browser)
+            {
+                var authState = await OidcClient.PrepareLoginAsync();
+
+                var browserOptions = new ExtendedBrowserOptions(authState.StartUrl, OidcClient.Options.RedirectUri)
+                {
+                    Timeout = TimeSpan.FromSeconds(request.BrowserTimeout),
+                    DisplayMode = request.BrowserDisplayMode,
+                    LoadDetourUrl = true,
+                    DetourUrl = detourUrl
+                };
+
+                if (OidcClient.Options.ResponseMode == OidcClientOptions.AuthorizeResponseMode.FormPost)
+                {
+                    browserOptions.ResponseMode = OidcClientOptions.AuthorizeResponseMode.FormPost;
+                }
+                else
+                {
+                    browserOptions.ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect;
+                }
+
+                var browserResult = await browser.InvokeAsync(browserOptions);
+
+                if (browserResult.ResultType == BrowserResultType.Success)
+                {
+                    var result = await ProcessResponseAsync(
+                        browserResult.Response,
+                        authState,
+                        request.BackChannelExtraParameters);
+
+                    return result;
+                }
+
+                return new LoginResult(browserResult.Error ?? browserResult.ResultType.ToString());
+            }
+
+            await OidcClient.Options.Browser.InvokeAsync(new BrowserOptions(detourUrl, "null"));
+            return new LoginResult("UserCancel");
         }
     }
 }

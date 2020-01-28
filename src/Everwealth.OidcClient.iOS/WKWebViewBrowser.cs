@@ -28,6 +28,11 @@ namespace Everwealth.OidcClient
         /// <inheritdoc/>
         protected override Task<BrowserResult> Launch(BrowserOptions options)
         {
+            if (options is ExtendedBrowserOptions extendedOptions)
+            {
+                extendedOptions.RestartFlowRoutes = _restartFlowRoutes;
+                return Start(extendedOptions);
+            }
             return Start(new ExtendedBrowserOptions(options.StartUrl, options.EndUrl, _restartFlowRoutes));
         }
 
@@ -111,7 +116,7 @@ namespace Everwealth.OidcClient
             var webViewConfig = new WKWebViewConfiguration();
             //webViewConfig.SetUrlSchemeHandler(new CallbackHandler(), endUrl.Scheme);
             WebView = new WKWebView(new CGRect(0, 0, 0, 0), webViewConfig);
-            WebView.LoadRequest(new NSUrlRequest(new NSUrl(options.StartUrl)));
+            WebView.LoadRequest(new NSUrlRequest(new NSUrl(options.LoadDetourUrl ? options.DetourUrl : options.StartUrl)));
             WebView.WeakNavigationDelegate = this;
         }
 

@@ -67,7 +67,14 @@ namespace Everwealth.OidcClient
 
             ActivityMediator.Instance.ActivityMessageReceived += Callback;
 
-            OpenBrowser(Android.Net.Uri.Parse(options.StartUrl), context ?? Application.Context);
+            if (options is ExtendedBrowserOptions extendedOptions && extendedOptions.LoadDetourUrl)
+            {
+                OpenBrowser(Android.Net.Uri.Parse(extendedOptions.StartUrl), Android.Net.Uri.Parse(extendedOptions.DetourUrl), context ?? Application.Context);
+            }
+            else
+            {
+                OpenBrowser(Android.Net.Uri.Parse(options.StartUrl), context ?? Application.Context);
+            }
 
             return tcs.Task;
         }
@@ -78,5 +85,15 @@ namespace Everwealth.OidcClient
         /// <param name="uri"><see cref="Uri"/> address to open in the browser.</param>
         /// <param name="context">Optional <see cref="Context"/> associated with the browser.</param>
         protected abstract void OpenBrowser(Android.Net.Uri uri, Context context = null);
+
+        /// <summary>
+        /// Open a web browser with the given uri.
+        /// </summary>
+        /// <param name="uri"><see cref="Uri"/> address to open in the browser.</param>
+        /// <param name="context">Optional <see cref="Context"/> associated with the browser.</param>
+        protected virtual void OpenBrowser(Android.Net.Uri startUri, Android.Net.Uri detourUri, Context context = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
