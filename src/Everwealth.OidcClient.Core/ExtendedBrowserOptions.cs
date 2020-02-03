@@ -9,9 +9,10 @@ namespace Everwealth.OidcClient
         {
         }
 
-        public ExtendedBrowserOptions(string startUrl, string endUrl, string[] restartFlowRoutes) : base(startUrl, endUrl)
+        public ExtendedBrowserOptions(string startUrl, string endUrl, string[] restartFlowRoutes, string[] viewableUrls) : base(startUrl, endUrl)
         {
             RestartFlowRoutes = restartFlowRoutes;
+            ViewableUrls = viewableUrls;
         }
 
         /// <summary>
@@ -19,6 +20,11 @@ namespace Everwealth.OidcClient
         /// Routes should be formatted excluding the domain eg. /signin
         /// </summary>
         public string[] RestartFlowRoutes { get; set; }
+
+        /// <summary>
+        /// Whitelisted external URLs that could be available in the identity flow
+        /// </summary>
+        public string[] ViewableUrls { get; set; }
 
         /// <summary>
         /// An boolean that determines whether the detour URL should be loaded.
