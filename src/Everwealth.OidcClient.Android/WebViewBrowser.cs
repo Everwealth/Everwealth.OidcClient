@@ -17,15 +17,18 @@ namespace Everwealth.OidcClient
     public class WebViewBrowser : AndroidBrowserBase
     {
         private string[] _restartFlowRoutes;
+        private readonly string[] _viewableUrls;
+
         /// <summary>
         /// Create a new instance of <see cref="WebViewBrowser"/> for a given <see cref="Context"/>.
         /// </summary>
         /// <param name="context"><see cref="Context"/> provided to any subsequent callback.</param>
         /// <param name="restartFlowRoutes">If one of these routes is hit after the initial request, the flow will be restarted. Routes should be formatted excluding the domain eg. /signin</param>
-        public WebViewBrowser(Context context = null, string[] restartFlowRoutes = null)
+        public WebViewBrowser(Context context = null, string[] restartFlowRoutes = null, string[] viewableUrls = null)
             : base(context)
         {
             _restartFlowRoutes = restartFlowRoutes;
+            _viewableUrls = viewableUrls;
         }
 
         /// <inheritdoc/>
@@ -56,7 +59,7 @@ namespace Everwealth.OidcClient
             intent.PutExtra(WebViewActivity.EXTRA_URL, startUri.ToString());
             intent.PutExtra(WebViewActivity.EXTRA_DETOUR_URL, detouredUri.ToString());
             intent.PutExtra(WebViewActivity.RESTART_PATHS, _restartFlowRoutes);
-
+            intent.PutExtra(WebViewActivity.VIEWABLE_URLS, _viewableUrls);
             context.StartActivity(intent);
         }
     }
@@ -67,6 +70,7 @@ namespace Everwealth.OidcClient
         public const string EXTRA_URL = "extra.url";
         public const string EXTRA_DETOUR_URL = "extra.detoururl";
         public const string RESTART_PATHS = "restart.paths";
+        public const string VIEWABLE_URLS = "extra.viewableurls";
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -83,9 +87,10 @@ namespace Everwealth.OidcClient
             string url = Intent.GetStringExtra(EXTRA_URL);
             string detourUrl = Intent.GetStringExtra(EXTRA_DETOUR_URL);
             string[] restartPaths = Intent.GetStringArrayExtra(RESTART_PATHS);
+            string[] viewableUrls = Intent.GetStringArrayExtra(VIEWABLE_URLS);
             WebView webView = FindViewById<WebView>(Resource.Id.webview);
             ProgressBar progressDialog = FindViewById<ProgressBar>(Resource.Id.progressBar);
-            var webViewClient = new CustomSchemeWebViewClient(webView, progressDialog, url, restartPaths, OnSuccessLogin, detourUrl, this);
+            var webViewClient = new CustomSchemeWebViewClient(webView, progressDialog, url, restartPaths, OnSuccessLogin, detourUrl, viewableUrls, this);
             webView.SetWebViewClient(webViewClient);
             
             WebSettings webSettings = webView.Settings;
@@ -121,17 +126,26 @@ namespace Everwealth.OidcClient
             private readonly Uri _startUrl;
             private readonly string[] _restartPaths;
             private readonly Action _onSuccess;
+            private readonly string[] _viewableUrls;
             private readonly Uri _detourUrl;
 
             public Context Context { get; }
 
-            public CustomSchemeWebViewClient(WebView webView, ProgressBar progressDialog, string startUrl, string[] restartPaths, Action onSuccess, string detourUrl, Context context)
+            public CustomSchemeWebViewClient(WebView webView,
+                                             ProgressBar progressDialog,
+                                             string startUrl,
+                                             string[] restartPaths,
+                                             Action onSuccess,
+                                             string detourUrl,
+                                             string[] viewableUrls,
+                                             Context context)
             {
                 _webView = webView;
                 _progressDialog = progressDialog;
                 _startUrl = new Uri(startUrl);
                 _restartPaths = restartPaths;
                 _onSuccess = onSuccess;
+                _viewableUrls = viewableUrls;
                 Context = context;
                 _detourUrl = string.IsNullOrEmpty(detourUrl) ? null : new Uri(detourUrl);
                 
@@ -164,18 +178,16 @@ namespace Everwealth.OidcClient
                         _webView.LoadUrl(_startUrl.ToString());
                         return true;
                     }
-                    else if (url.Host != _startUrl.Host )
+                    else if (_viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == url.Host))
                     {
-                        if (_detourUrl == null || url.Host != _detourUrl.Host)
-                        {
-                            Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
+                        Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
 
-                            var i = new Intent(Intent.ActionView);
-                            i.SetData(url);
-                            i.AddFlags(ActivityFlags.NoHistory);
-                            Context.StartActivity(i);
-                            return true;
-                        }
+                        var i = new Intent(Intent.ActionView);
+                        i.SetData(url);
+                        i.AddFlags(ActivityFlags.NoHistory);
+                        Context.StartActivity(i);
+                        return true;
+                        
                     }
                 }
                 _progressDialog.Visibility = ViewStates.Visible;
@@ -208,18 +220,16 @@ namespace Everwealth.OidcClient
                     _webView.LoadUrl(_startUrl.ToString());
                     return true;
                 }
-                else if (uri.Host != _startUrl.Host)
+                else if (_viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == uri.Host))
                 {
-                    if (_detourUrl == null || uri.Host != _detourUrl.Host)
-                    {
-                        Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
+                    Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
 
-                        var i = new Intent(Intent.ActionView);
-                        i.SetData(uri);
-                        i.AddFlags(ActivityFlags.NoHistory);
-                        Context.StartActivity(i);
-                        return true;
-                    }
+                    var i = new Intent(Intent.ActionView);
+                    i.SetData(uri);
+                    i.AddFlags(ActivityFlags.NoHistory);
+                    Context.StartActivity(i);
+                    return true;
+
                 }
                 _progressDialog.Visibility = ViewStates.Visible;
                 return base.ShouldOverrideUrlLoading(view, url);

@@ -16,13 +16,16 @@ namespace Everwealth.OidcClient
     public class WKWebViewBrowser : IOSBrowserBase
     {
         private string[] _restartFlowRoutes;
+        private readonly string[] _viewableUrls;
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="restartFlowRoutes">If one of these routes is hit after the initial request, the flow will be restarted. Routes should be formatted excluding the domain eg. /signin</param>
-        public WKWebViewBrowser(string[] restartFlowRoutes = null)
+        public WKWebViewBrowser(string[] restartFlowRoutes = null, string[] viewableUrls = null)
         {
             _restartFlowRoutes = restartFlowRoutes;
+            _viewableUrls = viewableUrls;
         }
 
         /// <inheritdoc/>
@@ -31,9 +34,10 @@ namespace Everwealth.OidcClient
             if (options is ExtendedBrowserOptions extendedOptions)
             {
                 extendedOptions.RestartFlowRoutes = _restartFlowRoutes;
+                extendedOptions.ViewableUrls = _viewableUrls;
                 return Start(extendedOptions);
             }
-            return Start(new ExtendedBrowserOptions(options.StartUrl, options.EndUrl, _restartFlowRoutes));
+            return Start(new ExtendedBrowserOptions(options.StartUrl, options.EndUrl, _restartFlowRoutes, _viewableUrls));
         }
 
         internal static Task<BrowserResult> Start(ExtendedBrowserOptions options)
@@ -193,15 +197,12 @@ namespace Everwealth.OidcClient
                     Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
                     WebView.LoadRequest(new NSUrlRequest(new NSUrl(_options.StartUrl)));
                 }
-                else if (url.Host != new NSUrl(_options.StartUrl).Host && url.Host != new NSUrl(_options.EndUrl).Host)
-                {
-                    if (string.IsNullOrEmpty(_options?.DetourUrl) || url.Host != new NSUrl(_options?.DetourUrl)?.Host)
+                else if (_options.ViewableUrls.Any(x => new NSUrl(x).Host == url.Host))
+                { 
+                    if (UIApplication.SharedApplication.CanOpenUrl(url))
                     {
-                        if (UIApplication.SharedApplication.CanOpenUrl(url))
-                        {
-                            Console.WriteLine("Policy Decision: We hit other URL, open in Safari");
-                            UIApplication.SharedApplication.OpenUrl(url);
-                        }
+                        Console.WriteLine("Policy Decision: We hit other URL, open in Safari");
+                        UIApplication.SharedApplication.OpenUrl(url);
                     }
                 }
             }
