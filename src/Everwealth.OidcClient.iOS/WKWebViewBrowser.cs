@@ -197,7 +197,7 @@ namespace Everwealth.OidcClient
                     Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
                     WebView.LoadRequest(new NSUrlRequest(new NSUrl(_options.StartUrl)));
                 }
-                else if (_options.ViewableUrls.Any(x => new NSUrl(x).Host == url.Host))
+                else if (_options.ViewableUrls != null && _options.ViewableUrls.Any(x => new NSUrl(x).Host == url.Host))
                 { 
                     if (UIApplication.SharedApplication.CanOpenUrl(url))
                     {

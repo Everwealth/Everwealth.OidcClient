@@ -178,7 +178,7 @@ namespace Everwealth.OidcClient
                         _webView.LoadUrl(_startUrl.ToString());
                         return true;
                     }
-                    else if (_viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == url.Host))
+                    else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == url.Host))
                     {
                         Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
 
@@ -220,7 +220,7 @@ namespace Everwealth.OidcClient
                     _webView.LoadUrl(_startUrl.ToString());
                     return true;
                 }
-                else if (_viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == uri.Host))
+                else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == uri.Host))
                 {
                     Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
 
