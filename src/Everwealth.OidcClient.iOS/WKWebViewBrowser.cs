@@ -193,6 +193,17 @@ namespace Everwealth.OidcClient
                     Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
                     WebView.LoadRequest(new NSUrlRequest(new NSUrl(_options.StartUrl)));
                 }
+                else if (url.Host != new NSUrl(_options.StartUrl).Host && url.Host != new NSUrl(_options.EndUrl).Host)
+                {
+                    if (string.IsNullOrEmpty(_options?.DetourUrl) || url.Host != new NSUrl(_options?.DetourUrl)?.Host)
+                    {
+                        if (UIApplication.SharedApplication.CanOpenUrl(url))
+                        {
+                            Console.WriteLine("Policy Decision: We hit other URL, open in Safari");
+                            UIApplication.SharedApplication.OpenUrl(url);
+                        }
+                    }
+                }
             }
             decisionHandler(WKNavigationActionPolicy.Allow);
         }
