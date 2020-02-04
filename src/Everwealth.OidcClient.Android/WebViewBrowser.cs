@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
@@ -8,6 +10,8 @@ using Android.OS;
 using Android.Views;
 using Android.Webkit;
 using Android.Widget;
+using Java.Util;
+using Newtonsoft.Json;
 
 namespace Everwealth.OidcClient
 {
@@ -18,17 +22,19 @@ namespace Everwealth.OidcClient
     {
         private string[] _restartFlowRoutes;
         private readonly string[] _viewableUrls;
+        private readonly Dictionary<object, object> _headers;
 
         /// <summary>
         /// Create a new instance of <see cref="WebViewBrowser"/> for a given <see cref="Context"/>.
         /// </summary>
         /// <param name="context"><see cref="Context"/> provided to any subsequent callback.</param>
         /// <param name="restartFlowRoutes">If one of these routes is hit after the initial request, the flow will be restarted. Routes should be formatted excluding the domain eg. /signin</param>
-        public WebViewBrowser(Context context = null, string[] restartFlowRoutes = null, string[] viewableUrls = null)
+        public WebViewBrowser(Context context = null, string[] restartFlowRoutes = null, string[] viewableUrls = null, Dictionary<object,object> headers = null)
             : base(context)
         {
             _restartFlowRoutes = restartFlowRoutes;
             _viewableUrls = viewableUrls;
+            _headers = headers;
         }
 
         /// <inheritdoc/>
@@ -43,6 +49,9 @@ namespace Everwealth.OidcClient
             // Send uri through to activity
             intent.PutExtra(WebViewActivity.EXTRA_URL, uri.ToString());
             intent.PutExtra(WebViewActivity.RESTART_PATHS, _restartFlowRoutes);
+            intent.PutExtra(WebViewActivity.VIEWABLE_URLS, _viewableUrls);
+            var serializedHeaders = JsonConvert.SerializeObject(_headers);
+            intent.PutExtra(WebViewActivity.HEADERS, serializedHeaders);
 
             context.StartActivity(intent);
         }
@@ -60,6 +69,8 @@ namespace Everwealth.OidcClient
             intent.PutExtra(WebViewActivity.EXTRA_DETOUR_URL, detouredUri.ToString());
             intent.PutExtra(WebViewActivity.RESTART_PATHS, _restartFlowRoutes);
             intent.PutExtra(WebViewActivity.VIEWABLE_URLS, _viewableUrls);
+            var serializedHeaders = JsonConvert.SerializeObject(_headers);
+            intent.PutExtra(WebViewActivity.HEADERS, serializedHeaders);
             context.StartActivity(intent);
         }
     }
@@ -71,7 +82,7 @@ namespace Everwealth.OidcClient
         public const string EXTRA_DETOUR_URL = "extra.detoururl";
         public const string RESTART_PATHS = "restart.paths";
         public const string VIEWABLE_URLS = "extra.viewableurls";
-
+        public const string HEADERS = "extra.headers";
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -88,9 +99,16 @@ namespace Everwealth.OidcClient
             string detourUrl = Intent.GetStringExtra(EXTRA_DETOUR_URL);
             string[] restartPaths = Intent.GetStringArrayExtra(RESTART_PATHS);
             string[] viewableUrls = Intent.GetStringArrayExtra(VIEWABLE_URLS);
+            var headersExtra = Intent.GetStringExtra(HEADERS);
+            Dictionary<string, string> headers = null;
+            if (headersExtra != null)
+            {
+                headers = JsonConvert.DeserializeObject<Dictionary<object, object>>(Intent.GetStringExtra(HEADERS)).ToDictionary(k => k.Key.ToString(), v => v.Value.ToString());
+            }
+            
             WebView webView = FindViewById<WebView>(Resource.Id.webview);
             ProgressBar progressDialog = FindViewById<ProgressBar>(Resource.Id.progressBar);
-            var webViewClient = new CustomSchemeWebViewClient(webView, progressDialog, url, restartPaths, OnSuccessLogin, detourUrl, viewableUrls, this);
+            var webViewClient = new CustomSchemeWebViewClient(webView, progressDialog, url, restartPaths, OnSuccessLogin, detourUrl, viewableUrls, headers, this);
             webView.SetWebViewClient(webViewClient);
             
             WebSettings webSettings = webView.Settings;
@@ -99,7 +117,8 @@ namespace Everwealth.OidcClient
             ActionBar.SetBackgroundDrawable(new ColorDrawable(Color.White));
             ActionBar.SetDisplayHomeAsUpEnabled(true);
             ActionBar.SetHomeAsUpIndicator(Resource.Drawable.ic_close_black_24dp);
-            webView.LoadUrl(string.IsNullOrEmpty(detourUrl) ? url : detourUrl);
+
+            webView.LoadUrl(string.IsNullOrEmpty(detourUrl) ? url : detourUrl, headers ?? null);
         }
 
         private void OnSuccessLogin()
@@ -127,6 +146,7 @@ namespace Everwealth.OidcClient
             private readonly string[] _restartPaths;
             private readonly Action _onSuccess;
             private readonly string[] _viewableUrls;
+            private readonly Dictionary<string, string> _headers;
             private readonly Uri _detourUrl;
 
             public Context Context { get; }
@@ -138,6 +158,7 @@ namespace Everwealth.OidcClient
                                              Action onSuccess,
                                              string detourUrl,
                                              string[] viewableUrls,
+                                             Dictionary<string, string> headers,
                                              Context context)
             {
                 _webView = webView;
@@ -146,6 +167,7 @@ namespace Everwealth.OidcClient
                 _restartPaths = restartPaths;
                 _onSuccess = onSuccess;
                 _viewableUrls = viewableUrls;
+                _headers = headers;
                 Context = context;
                 _detourUrl = string.IsNullOrEmpty(detourUrl) ? null : new Uri(detourUrl);
                 
@@ -153,6 +175,7 @@ namespace Everwealth.OidcClient
 
             public override bool ShouldOverrideUrlLoading(WebView view, IWebResourceRequest request)
             {
+                
                 if (request?.Url != null && request.Url.Scheme != "http" && request.Url.Scheme != "https")
                 {
                     ActivityMediator.Instance.Send(request.Url.ToString());
@@ -175,7 +198,7 @@ namespace Everwealth.OidcClient
                         && restartPaths.Contains(url.Path, StringComparer.OrdinalIgnoreCase))
                     {
                         Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
-                        _webView.LoadUrl(_startUrl.ToString());
+                        _webView.LoadUrl(_startUrl.ToString(), _headers ?? new Dictionary<string, string>());
                         return true;
                     }
                     else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == url.Host))
@@ -191,12 +214,14 @@ namespace Everwealth.OidcClient
                     }
                 }
                 _progressDialog.Visibility = ViewStates.Visible;
-                return base.ShouldOverrideUrlLoading(view, request);
+                view.LoadUrl(request.Url.ToString(), _headers ?? new Dictionary<string, string>());
+                return true;
             }
 
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {
                 var uri = Android.Net.Uri.Parse(url);
+                
                 if (uri != null && uri.Scheme != "http" && uri.Scheme != "https")
                 {
                     ActivityMediator.Instance.Send(uri.ToString());
@@ -217,7 +242,7 @@ namespace Everwealth.OidcClient
                     && restartPaths.Contains(uri.Path, StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
-                    _webView.LoadUrl(_startUrl.ToString());
+                    _webView.LoadUrl(_startUrl.ToString(), _headers ?? new Dictionary<string, string>());
                     return true;
                 }
                 else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == uri.Host))
@@ -232,7 +257,9 @@ namespace Everwealth.OidcClient
 
                 }
                 _progressDialog.Visibility = ViewStates.Visible;
-                return base.ShouldOverrideUrlLoading(view, url);
+                view.LoadUrl(url, _headers ?? new Dictionary<string, string>());
+
+                return true;
             }
 
             public override void OnPageFinished(WebView view, string url)
