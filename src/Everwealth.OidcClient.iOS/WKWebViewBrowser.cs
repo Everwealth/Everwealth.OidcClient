@@ -18,14 +18,17 @@ namespace Everwealth.OidcClient
         private string[] _restartFlowRoutes;
         private readonly string[] _viewableUrls;
 
+        private readonly Dictionary<object, object> _headers;
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="restartFlowRoutes">If one of these routes is hit after the initial request, the flow will be restarted. Routes should be formatted excluding the domain eg. /signin</param>
-        public WKWebViewBrowser(string[] restartFlowRoutes = null, string[] viewableUrls = null)
+        public WKWebViewBrowser(string[] restartFlowRoutes = null, string[] viewableUrls = null, Dictionary<object, object> headers = null)
         {
             _restartFlowRoutes = restartFlowRoutes;
             _viewableUrls = viewableUrls;
+            _headers = headers;
         }
 
         /// <inheritdoc/>
@@ -35,9 +38,10 @@ namespace Everwealth.OidcClient
             {
                 extendedOptions.RestartFlowRoutes = _restartFlowRoutes;
                 extendedOptions.ViewableUrls = _viewableUrls;
+                extendedOptions.Headers = _headers;
                 return Start(extendedOptions);
             }
-            return Start(new ExtendedBrowserOptions(options.StartUrl, options.EndUrl, _restartFlowRoutes, _viewableUrls));
+            return Start(new ExtendedBrowserOptions(options.StartUrl, options.EndUrl, _restartFlowRoutes, _viewableUrls, _headers));
         }
 
         internal static Task<BrowserResult> Start(ExtendedBrowserOptions options)
@@ -120,7 +124,13 @@ namespace Everwealth.OidcClient
             var webViewConfig = new WKWebViewConfiguration();
             //webViewConfig.SetUrlSchemeHandler(new CallbackHandler(), endUrl.Scheme);
             WebView = new WKWebView(new CGRect(0, 0, 0, 0), webViewConfig);
-            WebView.LoadRequest(new NSUrlRequest(new NSUrl(options.LoadDetourUrl ? options.DetourUrl : options.StartUrl)));
+
+            var request = new NSMutableUrlRequest(new NSUrl(options.LoadDetourUrl ? options.DetourUrl : options.StartUrl));
+            if (_options.Headers != null)
+            {
+                request.Headers = NSDictionary.FromObjectsAndKeys(_options.Headers.Values.ToArray(), _options.Headers.Keys.ToArray());
+            }
+            WebView.LoadRequest(request);
             WebView.WeakNavigationDelegate = this;
         }
 
@@ -195,9 +205,15 @@ namespace Everwealth.OidcClient
                     && restartRoutes.Contains(url.Path, StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
-                    WebView.LoadRequest(new NSUrlRequest(new NSUrl(_options.StartUrl)));
+
+                    var request = new NSMutableUrlRequest(new NSUrl(_options.StartUrl));
+                    if (_options.Headers != null)
+                    {
+                        request.Headers = NSDictionary.FromObjectsAndKeys(_options.Headers.Values.ToArray(), _options.Headers.Keys.ToArray());
+                    }
+                    WebView.LoadRequest(request);
                 }
-                else if (_options.ViewableUrls.Any(x => new NSUrl(x).Host == url.Host))
+                else if (_options.ViewableUrls != null && _options.ViewableUrls.Any(x => new NSUrl(x).Host == url.Host))
                 { 
                     if (UIApplication.SharedApplication.CanOpenUrl(url))
                     {

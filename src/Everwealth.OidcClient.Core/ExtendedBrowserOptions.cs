@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using IdentityModel.OidcClient.Browser;
 
 namespace Everwealth.OidcClient
@@ -9,10 +10,11 @@ namespace Everwealth.OidcClient
         {
         }
 
-        public ExtendedBrowserOptions(string startUrl, string endUrl, string[] restartFlowRoutes, string[] viewableUrls) : base(startUrl, endUrl)
+        public ExtendedBrowserOptions(string startUrl, string endUrl, string[] restartFlowRoutes, string[] viewableUrls, Dictionary<object,object> headers) : base(startUrl, endUrl)
         {
             RestartFlowRoutes = restartFlowRoutes;
             ViewableUrls = viewableUrls;
+            Headers = headers;
         }
 
         /// <summary>
@@ -25,6 +27,7 @@ namespace Everwealth.OidcClient
         /// Whitelisted external URLs that could be available in the identity flow
         /// </summary>
         public string[] ViewableUrls { get; set; }
+        public Dictionary<object, object> Headers { get; set; }
 
         /// <summary>
         /// An boolean that determines whether the detour URL should be loaded.
