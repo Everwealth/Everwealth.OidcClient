@@ -201,7 +201,7 @@ namespace Everwealth.OidcClient
                         _webView.LoadUrl(_startUrl.ToString(), _headers ?? new Dictionary<string, string>());
                         return true;
                     }
-                    else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == url.Host))
+                    else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Equals(url)))
                     {
                         Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
 
