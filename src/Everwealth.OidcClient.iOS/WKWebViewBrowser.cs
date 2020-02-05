@@ -125,13 +125,20 @@ namespace Everwealth.OidcClient
             //webViewConfig.SetUrlSchemeHandler(new CallbackHandler(), endUrl.Scheme);
             WebView = new WKWebView(new CGRect(0, 0, 0, 0), webViewConfig);
 
+            WebView.WeakNavigationDelegate = this;
+
             var request = new NSMutableUrlRequest(new NSUrl(options.LoadDetourUrl ? options.DetourUrl : options.StartUrl));
             if (_options.Headers != null)
             {
-                request.Headers = NSDictionary.FromObjectsAndKeys(_options.Headers.Values.ToArray(), _options.Headers.Keys.ToArray());
+                var updatedRequest = UpdateHeaders(new NSMutableUrlRequest(new NSUrl(options.LoadDetourUrl ? options.DetourUrl : options.StartUrl)),
+                    _options.Headers.ToDictionary(k => k.Key.ToString(), v => v.Value.ToString()));
+                if (updatedRequest != null)
+                {
+                    WebView.LoadRequest(updatedRequest);
+                    return;
+                }
             }
             WebView.LoadRequest(request);
-            WebView.WeakNavigationDelegate = this;
         }
 
         public override void ViewDidLoad()
@@ -205,13 +212,15 @@ namespace Everwealth.OidcClient
                     && restartRoutes.Contains(url.Path, StringComparer.OrdinalIgnoreCase))
                 {
                     Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
-
-                    var request = new NSMutableUrlRequest(new NSUrl(_options.StartUrl));
                     if (_options.Headers != null)
                     {
-                        request.Headers = NSDictionary.FromObjectsAndKeys(_options.Headers.Values.ToArray(), _options.Headers.Keys.ToArray());
+                        var newSessionRequest = UpdateHeaders(new NSMutableUrlRequest(new NSUrl(_options.StartUrl)),
+                            _options.Headers.ToDictionary(k => k.Key.ToString(), v => v.Value.ToString()));
+                        if (newSessionRequest != null)
+                        {
+                            WebView.LoadRequest(newSessionRequest);
+                        }
                     }
-                    WebView.LoadRequest(request);
                 }
                 else if (_options.ViewableUrls != null && _options.ViewableUrls.Any(x => new NSUrl(x).Host == url.Host))
                 { 
@@ -220,9 +229,59 @@ namespace Everwealth.OidcClient
                         Console.WriteLine("Policy Decision: We hit other URL, open in Safari");
                         UIApplication.SharedApplication.OpenUrl(url);
                     }
+                    decisionHandler(WKNavigationActionPolicy.Cancel);
+                    return;
+                }
+                else
+                {
+                    // Inject custom headers into HTTP request. Currently only support GET request, due to https://forums.developer.apple.com/thread/125753
+                    if (_options.Headers != null && navigationAction.Request.HttpMethod == "GET")
+                    {
+                        var request = UpdateHeaders(navigationAction.Request, _options.Headers.ToDictionary(k => k.Key.ToString(), v => v.Value.ToString()));
+                        if (request != null)
+                        {
+                            WebView.LoadRequest(request);
+                            decisionHandler(WKNavigationActionPolicy.Cancel);
+                            return;
+                        }
+                    }
                 }
             }
             decisionHandler(WKNavigationActionPolicy.Allow);
+
+        }
+
+        private NSMutableUrlRequest UpdateHeaders(NSUrlRequest oldRequest, Dictionary<string, string> headers)
+        {
+            if (headers != null)
+            {
+                if (oldRequest.Headers != null)
+                {
+                    var currentRequestHeaders = oldRequest.Headers.ToDictionary(k => k.Key.ToString(), v => v.Value.ToString());
+                    if (!headers.All(x => currentRequestHeaders.ContainsKey(x.Key) && currentRequestHeaders[x.Key] == x.Value))
+                    {
+                        var request = (NSMutableUrlRequest)oldRequest.MutableCopy();
+                        foreach (var header in headers)
+                        {
+                            currentRequestHeaders.Add(header.Key, header.Value);
+                        }
+                        request.Headers = NSDictionary.FromObjectsAndKeys(currentRequestHeaders.Values.ToArray(), currentRequestHeaders.Keys.ToArray());
+                        return request;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    var request = (NSMutableUrlRequest)oldRequest.MutableCopy();
+                    request.Headers = NSDictionary.FromObjectsAndKeys(headers.Values.ToArray(), headers.Keys.ToArray());
+                    return request;
+                }
+            }
+            return null;
+
         }
 
         [Export("webView:didFinishNavigation:")]

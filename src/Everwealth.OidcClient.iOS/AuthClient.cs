@@ -21,6 +21,11 @@ namespace Everwealth.OidcClient
             options.Browser = options.Browser ?? new AutoSelectBrowser();
         }
 
+        public void SetBrowser(IBrowser browser)
+        {
+            OidcClient.Options.Browser = browser;
+        }
+
         public override async Task<LoginResult> DetouredLoginAsync(string detourUrl, LoginRequest request = null)
         {
             if (request == null) request = new LoginRequest();
