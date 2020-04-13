@@ -237,7 +237,7 @@ namespace Everwealth.OidcClient
                     // Inject custom headers into HTTP request. Currently only support GET request, due to https://forums.developer.apple.com/thread/125753
                     if (_options.Headers != null
                         && navigationAction.Request.HttpMethod == "GET"
-                        && (navigationAction.Request.Url.IsEqual(new NSUrl(_options.StartUrl)) || (_options.DetourUrl != null && navigationAction.Request.Url.IsEqual(new NSUrl(_options.DetourUrl)))))
+                        && (navigationAction.Request.Url.Host == new NSUrl(_options.StartUrl).Host || (_options.DetourUrl != null && navigationAction.Request.Url.Host == new NSUrl(_options.DetourUrl).Host)))
                     {
                         var request = UpdateHeaders(navigationAction.Request, _options.Headers.ToDictionary(k => k.Key.ToString(), v => v.Value.ToString()));
                         if (request != null)
