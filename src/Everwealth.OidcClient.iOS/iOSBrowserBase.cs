@@ -1,6 +1,7 @@
 ﻿using IdentityModel.OidcClient.Browser;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Everwealth.OidcClient
@@ -40,7 +41,7 @@ namespace Everwealth.OidcClient
         /// <param name="options"></param>
         /// <returns>A <see cref="Task"/> that will contain a <see cref="BrowserResult"/> with details of
         /// wether the launch process succeeded or not by way of a <see cref="BrowserResultType"/>.</returns>
-        protected abstract Task<BrowserResult> Launch(BrowserOptions options);
+        protected abstract Task<BrowserResult> Launch(BrowserOptions options, CancellationToken cancellationToken = default);
 
         internal static BrowserResult Canceled()
         {

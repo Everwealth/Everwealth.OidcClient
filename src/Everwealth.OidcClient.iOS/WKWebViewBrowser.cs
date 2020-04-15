@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
@@ -32,29 +33,29 @@ namespace Everwealth.OidcClient
         }
 
         /// <inheritdoc/>
-        protected override Task<BrowserResult> Launch(BrowserOptions options)
+        protected override Task<BrowserResult> Launch(BrowserOptions options, CancellationToken cancellationToken = default)
         {
             if (options is ExtendedBrowserOptions extendedOptions)
             {
                 extendedOptions.RestartFlowRoutes = _restartFlowRoutes;
                 extendedOptions.ViewableUrls = _viewableUrls;
                 extendedOptions.Headers = _headers;
-                return Start(extendedOptions);
+                return Start(extendedOptions, cancellationToken);
             }
-            return Start(new ExtendedBrowserOptions(options.StartUrl, options.EndUrl, _restartFlowRoutes, _viewableUrls, _headers));
+            return Start(new ExtendedBrowserOptions(options.StartUrl, options.EndUrl, _restartFlowRoutes, _viewableUrls, _headers), cancellationToken);
         }
 
-        internal static Task<BrowserResult> Start(ExtendedBrowserOptions options)
+        internal static Task<BrowserResult> Start(ExtendedBrowserOptions options, CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<BrowserResult>();
 
             // Create web view controller
-            var browserController = new UINavigationController(new WKWebViewController(options)
+            var browserController = new UINavigationController(new WKWebViewController(options, cancellationToken)
             {
                 ModalPresentationStyle = UIModalPresentationStyle.FormSheet,
             });
             browserController.PresentationController.Delegate = new DismissablePresentationControllerDelegate();
-
+            
             async void Callback(string response)
             {
                 ActivityMediator.Instance.ActivityMessageReceived -= Callback;
@@ -62,6 +63,8 @@ namespace Everwealth.OidcClient
                 if (response == "UserCancel")
                 {
                     BrowserMediator.Instance.Cancel();
+                    await browserController.DismissViewControllerAsync(true); // Close web view
+                    browserController.Dispose();
                     tcs.SetResult(Canceled());
                 }
                 else if (response == "RestartFlow")
@@ -117,7 +120,7 @@ namespace Everwealth.OidcClient
         public WKWebView WebView { get; set; }
         private UIActivityIndicatorView _activityIndicatorView;
         private readonly ExtendedBrowserOptions _options;
-        public WKWebViewController(ExtendedBrowserOptions options)
+        public WKWebViewController(ExtendedBrowserOptions options, CancellationToken cancellationToken)
         {
             _options = options;
 
@@ -126,6 +129,9 @@ namespace Everwealth.OidcClient
             WebView = new WKWebView(new CGRect(0, 0, 0, 0), webViewConfig);
 
             WebView.WeakNavigationDelegate = this;
+
+            // Setup cancellation action
+            cancellationToken.Register(() => UIApplication.SharedApplication.InvokeOnMainThread(() => ActivityMediator.Instance.Cancel()));
 
             var request = new NSMutableUrlRequest(new NSUrl(options.LoadDetourUrl ? options.DetourUrl : options.StartUrl));
             if (_options.Headers != null)
@@ -190,10 +196,9 @@ namespace Everwealth.OidcClient
             });
         }
 
-        private async void Cancelled(object sender, EventArgs e)
+        private void Cancelled(object sender, EventArgs e)
         {
             ActivityMediator.Instance.Cancel();
-            await NavigationController.DismissViewControllerAsync(true);
         }
 
         [Export("webView:decidePolicyForNavigationAction:decisionHandler:")]
