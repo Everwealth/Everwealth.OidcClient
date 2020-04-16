@@ -2,6 +2,7 @@
 using Android.Content;
 using IdentityModel.OidcClient.Browser;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Everwealth.OidcClient
@@ -33,7 +34,7 @@ namespace Everwealth.OidcClient
         }
 
         /// <inheritdoc/>
-        public Task<BrowserResult> InvokeAsync(BrowserOptions options)
+        public Task<BrowserResult> InvokeAsync(BrowserOptions options, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(options.StartUrl))
                 throw new ArgumentException("Missing StartUrl", nameof(options));
@@ -69,11 +70,11 @@ namespace Everwealth.OidcClient
 
             if (options is ExtendedBrowserOptions extendedOptions && extendedOptions.LoadDetourUrl)
             {
-                OpenBrowser(Android.Net.Uri.Parse(extendedOptions.StartUrl), Android.Net.Uri.Parse(extendedOptions.DetourUrl), context ?? Application.Context);
+                OpenBrowser(Android.Net.Uri.Parse(extendedOptions.StartUrl), Android.Net.Uri.Parse(extendedOptions.DetourUrl), context ?? Application.Context, cancellationToken);
             }
             else
             {
-                OpenBrowser(Android.Net.Uri.Parse(options.StartUrl), context ?? Application.Context);
+                OpenBrowser(Android.Net.Uri.Parse(options.StartUrl), context ?? Application.Context, cancellationToken);
             }
 
             return tcs.Task;
@@ -84,14 +85,14 @@ namespace Everwealth.OidcClient
         /// </summary>
         /// <param name="uri"><see cref="Uri"/> address to open in the browser.</param>
         /// <param name="context">Optional <see cref="Context"/> associated with the browser.</param>
-        protected abstract void OpenBrowser(Android.Net.Uri uri, Context context = null);
+        protected abstract void OpenBrowser(Android.Net.Uri uri, Context context = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Open a web browser with the given uri.
         /// </summary>
         /// <param name="uri"><see cref="Uri"/> address to open in the browser.</param>
         /// <param name="context">Optional <see cref="Context"/> associated with the browser.</param>
-        protected virtual void OpenBrowser(Android.Net.Uri startUri, Android.Net.Uri detourUri, Context context = null)
+        protected virtual void OpenBrowser(Android.Net.Uri startUri, Android.Net.Uri detourUri, Context context = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

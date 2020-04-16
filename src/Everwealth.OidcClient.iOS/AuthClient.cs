@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Browser;
@@ -26,7 +27,7 @@ namespace Everwealth.OidcClient
             OidcClient.Options.Browser = browser;
         }
 
-        public override async Task<LoginResult> DetouredLoginAsync(string detourUrl, LoginRequest request = null)
+        public override async Task<LoginResult> DetouredLoginAsync(string detourUrl, LoginRequest request = null, CancellationToken cancellationToken = default)
         {
             if (request == null) request = new LoginRequest();
 

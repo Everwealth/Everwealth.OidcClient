@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Results;
@@ -18,7 +20,7 @@ namespace Everwealth.OidcClient
         /// </summary>
         /// <param name="request">Request object.</param>
         /// <returns>A <see cref="LoginResult"/> containing the tokens and claims.</returns>
-        Task<LoginResult> LoginAsync(LoginRequest request = null);
+        Task<LoginResult> LoginAsync(LoginRequest request = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Starts a session at the provided URL and starts a login if registered restart route is hit.
@@ -26,7 +28,7 @@ namespace Everwealth.OidcClient
         /// <param name="alternateUrl">URL to be loaded.</param>
         /// <param name="request">Request object.</param>
         /// <returns>A <see cref="LoginResult"/> containing the tokens and claims.</returns>
-        Task<LoginResult> DetouredLoginAsync(string detourUrl, LoginRequest request = null);
+        Task<LoginResult> DetouredLoginAsync(string detourUrl, LoginRequest request = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Starts a logout.
@@ -42,7 +44,7 @@ namespace Everwealth.OidcClient
         /// </summary>
         /// <param name="extraParameters">Optional extra parameters that need to be passed to the endpoint.</param>
         /// <returns>A <see cref="AuthorizeState"/> with necessary URLs, nonce, state and code verifiers.</returns>
-        Task<AuthorizeState> PrepareLoginAsync(object extraParameters = null);
+        Task<AuthorizeState> PrepareLoginAsync(IDictionary<string, string> extraParameters = null);
 
         /// <summary>
         /// Creates a logout URL.
@@ -58,7 +60,7 @@ namespace Everwealth.OidcClient
         /// <param name="state">The <see cref="AuthorizeState"/> which was generated when the <see cref="PrepareLoginAsync"/>
         /// method was called.</param>
         /// <returns>A <see cref="LoginResult"/> containing the tokens and claims.</returns>
-        Task<LoginResult> ProcessResponseAsync(string data, AuthorizeState state, object extraParameters = null);
+        Task<LoginResult> ProcessResponseAsync(string data, AuthorizeState state, IDictionary<string, string> extraParameters = null);
 
         /// <summary>
         /// Generates a new set of tokens based on a refresh token. 
@@ -67,7 +69,7 @@ namespace Everwealth.OidcClient
         /// calls to <see cref="IdentityModel.OidcClient.OidcClient.RefreshTokenAsync"/>.</param>
         /// <param name="extraParameters">Optional extra parameters that need to be passed to the endpoint.</param>
         /// <returns>A <see cref="RefreshTokenResult"/> with the refreshed tokens.</returns>
-        Task<RefreshTokenResult> RefreshTokenAsync(string refreshToken, object extraParameters = null);
+        Task<RefreshTokenResult> RefreshTokenAsync(string refreshToken, IDictionary<string, string> extraParameters = null);
 
         /// <summary>
         /// Gets the user claims from the userinfo endpoint.

@@ -1,3 +1,4 @@
+using System.Threading;
 using Android.Content;
 using Android.OS;
 using IdentityModel.OidcClient.Browser;
@@ -19,7 +20,7 @@ namespace Everwealth.OidcClient
         }
 
         /// <inheritdoc/>
-        protected override void OpenBrowser(Android.Net.Uri uri, Context context = null)
+        protected override void OpenBrowser(Android.Net.Uri uri, Context context = null, CancellationToken cancellationToken = default)
         {
             var intent = new Intent(Intent.ActionView, uri);
             intent.AddFlags(ActivityFlags.NoHistory);

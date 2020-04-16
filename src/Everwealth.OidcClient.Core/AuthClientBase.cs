@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Results;
@@ -32,11 +34,11 @@ namespace Everwealth.OidcClient
         }
 
         /// <inheritdoc />
-        public Task<LoginResult> LoginAsync(LoginRequest request = null)
+        public Task<LoginResult> LoginAsync(LoginRequest request = null, CancellationToken cancellationToken = default)
         {
             Debug.WriteLine($"Using Callback URL ${Options.RedirectUri}. Ensure this is an Allowed Callback URL for application/client ID ${Options.ClientId}.");
 
-            return OidcClient.LoginAsync(request);
+            return OidcClient.LoginAsync(request, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -57,13 +59,13 @@ namespace Everwealth.OidcClient
         }
 
         /// <inheritdoc/>
-        public Task<AuthorizeState> PrepareLoginAsync(object extraParameters = null)
+        public Task<AuthorizeState> PrepareLoginAsync(IDictionary<string, string> extraParameters = null)
         {
             return OidcClient.PrepareLoginAsync(extraParameters);
         }
 
         /// <inheritdoc/>
-        public Task<LoginResult> ProcessResponseAsync(string data, AuthorizeState state, object extraParameters = null)
+        public Task<LoginResult> ProcessResponseAsync(string data, AuthorizeState state, IDictionary<string, string> extraParameters = null)
         {
             return OidcClient.ProcessResponseAsync(data, state, extraParameters);
         }
@@ -75,7 +77,7 @@ namespace Everwealth.OidcClient
         }
 
         /// <inheritdoc/>
-        public Task<RefreshTokenResult> RefreshTokenAsync(string refreshToken, object extraParameters = null)
+        public Task<RefreshTokenResult> RefreshTokenAsync(string refreshToken, IDictionary<string, string> extraParameters = null)
         {
             return OidcClient.RefreshTokenAsync(refreshToken, extraParameters);
         }
@@ -86,7 +88,7 @@ namespace Everwealth.OidcClient
             return OidcClient.GetUserInfoAsync(accessToken);
         }
 
-        public virtual Task<LoginResult> DetouredLoginAsync(string alternateUrl, LoginRequest request = null)
+        public virtual Task<LoginResult> DetouredLoginAsync(string alternateUrl, LoginRequest request = null, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
+using System.Threading;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
@@ -10,7 +10,6 @@ using Android.OS;
 using Android.Views;
 using Android.Webkit;
 using Android.Widget;
-using Java.Util;
 using Newtonsoft.Json;
 
 namespace Everwealth.OidcClient
@@ -23,6 +22,9 @@ namespace Everwealth.OidcClient
         private string[] _restartFlowRoutes;
         private readonly string[] _viewableUrls;
         private readonly Dictionary<object, object> _headers;
+
+        // We need this to be static because we can't pass an instance to the webview activity without serializing it :(
+        public static CancellationToken CancellationToken;
 
         /// <summary>
         /// Create a new instance of <see cref="WebViewBrowser"/> for a given <see cref="Context"/>.
@@ -38,7 +40,7 @@ namespace Everwealth.OidcClient
         }
 
         /// <inheritdoc/>
-        protected override void OpenBrowser(Android.Net.Uri uri, Context context = null)
+        protected override void OpenBrowser(Android.Net.Uri uri, Context context = null, CancellationToken cancellationToken = default)
         {
             var intent = new Intent(context, typeof(WebViewActivity));
             //intent.AddFlags(ActivityFlags.NoHistory);
@@ -50,27 +52,32 @@ namespace Everwealth.OidcClient
             intent.PutExtra(WebViewActivity.EXTRA_URL, uri.ToString());
             intent.PutExtra(WebViewActivity.RESTART_PATHS, _restartFlowRoutes);
             intent.PutExtra(WebViewActivity.VIEWABLE_URLS, _viewableUrls);
-            var serializedHeaders = JsonConvert.SerializeObject(_headers);
+            var serializedHeaders = JsonConvert.SerializeObject(_headers ?? new Dictionary<object, object>());
             intent.PutExtra(WebViewActivity.HEADERS, serializedHeaders);
 
+            CancellationToken = cancellationToken;
+            
             context.StartActivity(intent);
         }
 
-        protected override void OpenBrowser(Android.Net.Uri startUri, Android.Net.Uri detouredUri, Context context = null)
+        protected override void OpenBrowser(Android.Net.Uri startUri, Android.Net.Uri detouredUri, Context context = null, CancellationToken cancellationToken = default)
         {
             var intent = new Intent(context, typeof(WebViewActivity));
             //intent.AddFlags(ActivityFlags.NoHistory);
 
             if (IsNewTask)
                 intent.AddFlags(ActivityFlags.NewTask);
-
+            
             // Send uri through to activity
             intent.PutExtra(WebViewActivity.EXTRA_URL, startUri.ToString());
             intent.PutExtra(WebViewActivity.EXTRA_DETOUR_URL, detouredUri.ToString());
             intent.PutExtra(WebViewActivity.RESTART_PATHS, _restartFlowRoutes);
             intent.PutExtra(WebViewActivity.VIEWABLE_URLS, _viewableUrls);
-            var serializedHeaders = JsonConvert.SerializeObject(_headers);
+            var serializedHeaders = JsonConvert.SerializeObject(_headers ?? new Dictionary<object, object>());
             intent.PutExtra(WebViewActivity.HEADERS, serializedHeaders);
+
+            CancellationToken = cancellationToken;
+
             context.StartActivity(intent);
         }
     }
@@ -88,6 +95,9 @@ namespace Everwealth.OidcClient
             base.OnCreate(savedInstanceState);
 
             SetContentView(Resource.Layout.activity_webview);
+
+            // Setup cancel action
+            WebViewBrowser.CancellationToken.Register(() => Finish());
 
             // Cookie settings
             CookieSyncManager.CreateInstance(this);

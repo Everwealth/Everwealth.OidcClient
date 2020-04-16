@@ -4,6 +4,7 @@ using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Browser;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Everwealth.OidcClient
@@ -105,7 +106,7 @@ namespace Everwealth.OidcClient
             return resourceId > 0 ? context.Resources.GetString(resourceId) : value;
         }
 
-        public override async Task<LoginResult> DetouredLoginAsync(string detourUrl, LoginRequest request = null)
+        public override async Task<LoginResult> DetouredLoginAsync(string detourUrl, LoginRequest request = null, CancellationToken cancellationToken = default)
         {
             if (request == null) request = new LoginRequest();
 
@@ -130,7 +131,7 @@ namespace Everwealth.OidcClient
                     browserOptions.ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect;
                 }
 
-                var browserResult = await browser.InvokeAsync(browserOptions);
+                var browserResult = await browser.InvokeAsync(browserOptions, cancellationToken);
 
                 if (browserResult.ResultType == BrowserResultType.Success)
                 {

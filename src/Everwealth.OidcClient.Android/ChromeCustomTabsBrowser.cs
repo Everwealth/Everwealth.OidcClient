@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Android.Content;
 using Android.Support.CustomTabs;
 
@@ -24,7 +25,7 @@ namespace Everwealth.OidcClient
         }
 
         /// <inheritdoc/>
-        protected override void OpenBrowser(Android.Net.Uri uri, Context context = null)
+        protected override void OpenBrowser(Android.Net.Uri uri, Context context = null, CancellationToken cancellationToken = default)
         {
             //using (var builder = new CustomTabsIntent.Builder(_customTabsServiceConnection.Session))
             using (var builder = new CustomTabsIntent.Builder())

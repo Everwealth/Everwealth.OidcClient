@@ -11,7 +11,7 @@
     <description>Everwealth OIDC Client for native apps</description>
     <dependencies>
       <group targetFramework="netstandard2.0">
-        <dependency id="IdentityModel.OidcClient" version="2.9.1" />
+        <dependency id="IdentityModel.OidcClient" version="3.1.2" />
       </group>
     </dependencies>
   </metadata>

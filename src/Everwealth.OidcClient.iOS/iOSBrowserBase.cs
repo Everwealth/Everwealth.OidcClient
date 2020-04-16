@@ -12,7 +12,7 @@ namespace Everwealth.OidcClient
     public abstract class IOSBrowserBase : IBrowser
     {
         /// <inheritdoc/>
-        public Task<BrowserResult> InvokeAsync(BrowserOptions options)
+        public Task<BrowserResult> InvokeAsync(BrowserOptions options, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(options.StartUrl))
                 throw new ArgumentException("Missing StartUrl", nameof(options));
@@ -20,11 +20,11 @@ namespace Everwealth.OidcClient
             if (string.IsNullOrWhiteSpace(options.EndUrl))
                 throw new ArgumentException("Missing EndUrl", nameof(options));
             
-            return Launch(options);
+            return Launch(options, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<BrowserResult> InvokeAsync(ExtendedBrowserOptions options)
+        public Task<BrowserResult> InvokeAsync(ExtendedBrowserOptions options, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(options.StartUrl))
                 throw new ArgumentException("Missing StartUrl", nameof(options));
@@ -32,7 +32,7 @@ namespace Everwealth.OidcClient
             if (string.IsNullOrWhiteSpace(options.EndUrl))
                 throw new ArgumentException("Missing EndUrl", nameof(options));
 
-            return Launch(options);
+            return Launch(options, cancellationToken);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Everwealth.OidcClient
         /// <param name="options"></param>
         /// <returns>A <see cref="Task"/> that will contain a <see cref="BrowserResult"/> with details of
         /// wether the launch process succeeded or not by way of a <see cref="BrowserResultType"/>.</returns>
-        protected abstract Task<BrowserResult> Launch(BrowserOptions options, CancellationToken cancellationToken = default);
+        protected abstract Task<BrowserResult> Launch(BrowserOptions options, CancellationToken cancellationToken);
 
         internal static BrowserResult Canceled()
         {
