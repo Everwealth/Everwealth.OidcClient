@@ -12,7 +12,7 @@ namespace Everwealth.OidcClient
     /// </summary>
     public abstract class AuthClientBase : IAuthClient
     {
-        public readonly OidcClientOptions Options;
+        public OidcClientOptions Options { get; private set; }
         private IdentityModel.OidcClient.OidcClient _oidcClient;
         protected IdentityModel.OidcClient.OidcClient OidcClient
         {
