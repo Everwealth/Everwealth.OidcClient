@@ -12,13 +12,13 @@ namespace Everwealth.OidcClient
     /// </summary>
     public abstract class AuthClientBase : IAuthClient
     {
-        private readonly OidcClientOptions _options;
+        public readonly OidcClientOptions Options;
         private IdentityModel.OidcClient.OidcClient _oidcClient;
         protected IdentityModel.OidcClient.OidcClient OidcClient
         {
             get
             {
-                return _oidcClient ?? (_oidcClient = new IdentityModel.OidcClient.OidcClient(_options));
+                return _oidcClient ?? (_oidcClient = new IdentityModel.OidcClient.OidcClient(Options));
             }
         }
 
@@ -28,13 +28,13 @@ namespace Everwealth.OidcClient
         /// <param name="options"><see cref="OidcClientOptions"/> specifying the configuration options for this client.</param>
         protected AuthClientBase(OidcClientOptions options)
         {
-            _options = options;
+            Options = options;
         }
 
         /// <inheritdoc />
         public Task<LoginResult> LoginAsync(LoginRequest request = null)
         {
-            Debug.WriteLine($"Using Callback URL ${_options.RedirectUri}. Ensure this is an Allowed Callback URL for application/client ID ${_options.ClientId}.");
+            Debug.WriteLine($"Using Callback URL ${Options.RedirectUri}. Ensure this is an Allowed Callback URL for application/client ID ${Options.ClientId}.");
 
             return OidcClient.LoginAsync(request);
         }
@@ -42,7 +42,7 @@ namespace Everwealth.OidcClient
         /// <inheritdoc/>
         public async Task<bool> LogoutAsync(LogoutRequest request = null)
         {
-            Debug.WriteLine($"Using Callback URL ${_options.PostLogoutRedirectUri}. Ensure this is an Allowed Logout URL for application/client ID ${_options.ClientId}.");
+            Debug.WriteLine($"Using Callback URL ${Options.PostLogoutRedirectUri}. Ensure this is an Allowed Logout URL for application/client ID ${Options.ClientId}.");
 
             try
             {
