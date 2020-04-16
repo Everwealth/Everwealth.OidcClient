@@ -11,7 +11,7 @@ namespace Everwealth.OidcClient
     /// </summary>
     public interface IAuthClient
     {
-        public OidcClientOptions Options { get; }
+        OidcClientOptions Options { get; }
 
         /// <summary>
         /// Starts a login.
