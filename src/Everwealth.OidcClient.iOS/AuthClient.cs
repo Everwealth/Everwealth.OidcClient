@@ -33,7 +33,7 @@ namespace Everwealth.OidcClient
 
             if (OidcClient.Options.Browser is WKWebViewBrowser browser)
             {
-                var authState = await OidcClient.PrepareLoginAsync();
+                var authState = await OidcClient.PrepareLoginAsync(cancellationToken: cancellationToken);
 
                 var browserOptions = new ExtendedBrowserOptions(authState.StartUrl, OidcClient.Options.RedirectUri)
                 {
@@ -52,7 +52,7 @@ namespace Everwealth.OidcClient
                     browserOptions.ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect;
                 }
 
-                var browserResult = await browser.InvokeAsync(browserOptions);
+                var browserResult = await browser.InvokeAsync(browserOptions, cancellationToken);
 
                 if (browserResult.ResultType == BrowserResultType.Success)
                 {
@@ -67,7 +67,7 @@ namespace Everwealth.OidcClient
                 return new LoginResult(browserResult.Error ?? browserResult.ResultType.ToString());
             }
 
-            await OidcClient.Options.Browser.InvokeAsync(new BrowserOptions(detourUrl, "null"));
+            await OidcClient.Options.Browser.InvokeAsync(new BrowserOptions(detourUrl, "null"), cancellationToken);
             return new LoginResult("UserCancel");
         }
     }
