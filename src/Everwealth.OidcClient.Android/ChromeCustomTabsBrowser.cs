@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using Android.Content;
-using Android.Support.CustomTabs;
+using AndroidX.Browser.CustomTabs;
 
 namespace Everwealth.OidcClient
 {
