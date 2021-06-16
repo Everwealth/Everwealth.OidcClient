@@ -90,6 +90,10 @@ namespace Everwealth.OidcClient
         public const string RESTART_PATHS = "restart.paths";
         public const string VIEWABLE_URLS = "extra.viewableurls";
         public const string HEADERS = "extra.headers";
+
+        private bool _isSuccessful, _isInBackground;
+        private string _callbackUrl;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -100,7 +104,6 @@ namespace Everwealth.OidcClient
             WebViewBrowser.CancellationToken.Register(() => Finish());
 
             // Cookie settings
-            CookieSyncManager.CreateInstance(this);
             var cookieManager = CookieManager.Instance;
             cookieManager.RemoveAllCookie();
             //cookieManager.SetAcceptCookie(false);
@@ -131,9 +134,34 @@ namespace Everwealth.OidcClient
             webView.LoadUrl(string.IsNullOrEmpty(detourUrl) ? url : detourUrl, headers ?? null);
         }
 
-        private void OnSuccessLogin()
+        private void OnSuccessLogin(string callbackUrl)
         {
-            Finish();
+            _callbackUrl = callbackUrl;
+            _isSuccessful = true;
+            if (!_isInBackground)
+            {
+                //Finish();
+            }
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            _isInBackground = false;
+
+            if (_isSuccessful)
+            {
+                ActivityMediator.Instance.Send(_callbackUrl);
+                Finish();
+            }
+
+
+        }
+
+        protected override void OnPause()
+        {
+            base.OnPause();
+            _isInBackground = true;
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -154,18 +182,18 @@ namespace Everwealth.OidcClient
             private readonly ProgressBar _progressDialog;
             private readonly Uri _startUrl;
             private readonly string[] _restartPaths;
-            private readonly Action _onSuccess;
+            private readonly Action<string> _onSuccess;
             private readonly string[] _viewableUrls;
             private readonly Dictionary<string, string> _headers;
             private readonly Uri _detourUrl;
 
             public Context Context { get; }
-
+            
             public CustomSchemeWebViewClient(WebView webView,
                                              ProgressBar progressDialog,
                                              string startUrl,
                                              string[] restartPaths,
-                                             Action onSuccess,
+                                             Action<string> onSuccess,
                                              string detourUrl,
                                              string[] viewableUrls,
                                              Dictionary<string, string> headers,
@@ -188,8 +216,9 @@ namespace Everwealth.OidcClient
                 
                 if (request?.Url != null && request.Url.Scheme != "http" && request.Url.Scheme != "https")
                 {
-                    ActivityMediator.Instance.Send(request.Url.ToString());
-                    _onSuccess?.Invoke();
+                    if (Context is WebViewActivity)
+                    //ActivityMediator.Instance.Send(request.Url.ToString());
+                    _onSuccess?.Invoke(request.Url.ToString());
                     return true;
                 }
 
@@ -198,8 +227,8 @@ namespace Everwealth.OidcClient
                     if (url.Scheme != "http" && url.Scheme != "https")
                     {
                         Console.WriteLine("URL loading overriden: Hit url {0}", url);
-                        ActivityMediator.Instance.Send(request.Url.ToString());
-                        _onSuccess?.Invoke();
+                        //ActivityMediator.Instance.Send(request.Url.ToString());
+                        _onSuccess?.Invoke(request.Url.ToString());
                         return true;
                     }
                     else if (_restartPaths is string[] restartPaths
@@ -228,55 +257,55 @@ namespace Everwealth.OidcClient
                 return true;
             }
 
-            public override bool ShouldOverrideUrlLoading(WebView view, string url)
-            {
-                var uri = Android.Net.Uri.Parse(url);
-                
-                if (uri != null && uri.Scheme != "http" && uri.Scheme != "https")
-                {
-                    ActivityMediator.Instance.Send(uri.ToString());
-                    _onSuccess?.Invoke();
-                    return true;
-                }
+        //    public override bool ShouldOverrideUrlLoading(WebView view, string url)
+        //    {
+        //        var uri = Android.Net.Uri.Parse(url);
 
-                if (uri.Scheme != "http" && uri.Scheme != "https")
-                {
-                    Console.WriteLine("URL loading overriden: Hit url {0}", url);
-                    ActivityMediator.Instance.Send(url);
-                    _onSuccess?.Invoke();
-                    return true;
-                }
-                else if (_restartPaths is string[] restartPaths
-                    && uri.Host == _startUrl.Host
-                    && string.IsNullOrEmpty(uri.Query)
-                    && restartPaths.Contains(uri.Path, StringComparer.OrdinalIgnoreCase))
-                {
-                    Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
-                    _webView.LoadUrl(_startUrl.ToString(), _headers ?? new Dictionary<string, string>());
-                    return true;
-                }
-                else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == uri.Host))
-                {
-                    Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
+        //        if (uri != null && uri.Scheme != "http" && uri.Scheme != "https")
+        //        {
+        //            ActivityMediator.Instance.Send(uri.ToString());
+        //            _onSuccess?.Invoke(uri.ToString());
+        //            return true;
+        //        }
 
-                    var i = new Intent(Intent.ActionView);
-                    i.SetData(uri);
-                    i.AddFlags(ActivityFlags.NoHistory);
-                    Context.StartActivity(i);
-                    return true;
+        //        if (uri.Scheme != "http" && uri.Scheme != "https")
+        //        {
+        //            Console.WriteLine("URL loading overriden: Hit url {0}", url);
+        //            ActivityMediator.Instance.Send(url);
+        //            _onSuccess?.Invoke();
+        //            return true;
+        //        }
+        //        else if (_restartPaths is string[] restartPaths
+        //            && uri.Host == _startUrl.Host
+        //            && string.IsNullOrEmpty(uri.Query)
+        //            && restartPaths.Contains(uri.Path, StringComparer.OrdinalIgnoreCase))
+        //        {
+        //            Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
+        //            _webView.LoadUrl(_startUrl.ToString(), _headers ?? new Dictionary<string, string>());
+        //            return true;
+        //        }
+        //        else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == uri.Host))
+        //        {
+        //            Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
 
-                }
-                _progressDialog.Visibility = ViewStates.Visible;
-                view.LoadUrl(url, _headers ?? new Dictionary<string, string>());
+        //            var i = new Intent(Intent.ActionView);
+        //            i.SetData(uri);
+        //            i.AddFlags(ActivityFlags.NoHistory);
+        //            Context.StartActivity(i);
+        //            return true;
 
-                return true;
-            }
+        //        }
+        //        _progressDialog.Visibility = ViewStates.Visible;
+        //        view.LoadUrl(url, _headers ?? new Dictionary<string, string>());
 
-            public override void OnPageFinished(WebView view, string url)
-            {
-                base.OnPageFinished(view, url);
-                _progressDialog.Visibility = ViewStates.Invisible;
-            }
-        }
+        //        return true;
+        //    }
+
+        //    public override void OnPageFinished(WebView view, string url)
+        //    {
+        //        base.OnPageFinished(view, url);
+        //        _progressDialog.Visibility = ViewStates.Invisible;
+        //    }
+        //}
     }
 }
