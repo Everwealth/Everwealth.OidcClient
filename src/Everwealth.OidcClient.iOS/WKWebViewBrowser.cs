@@ -125,6 +125,7 @@ namespace Everwealth.OidcClient
             _options = options;
 
             var webViewConfig = new WKWebViewConfiguration();
+            webViewConfig.WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore;
             //webViewConfig.SetUrlSchemeHandler(new CallbackHandler(), endUrl.Scheme);
             WebView = new WKWebView(new CGRect(0, 0, 0, 0), webViewConfig);
 

@@ -51,6 +51,7 @@
     <Compile Include="SFSafariViewControllerBrowser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WKWebViewBrowser.cs" />
+    <Compile Include="ASWebAuthenticatedSessionOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Everwealth.OidcClient.Core\Everwealth.OidcClient.Core.csproj">
