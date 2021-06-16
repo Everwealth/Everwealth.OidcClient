@@ -140,7 +140,8 @@ namespace Everwealth.OidcClient
             _isSuccessful = true;
             if (!_isInBackground)
             {
-                //Finish();
+                ActivityMediator.Instance.Send(_callbackUrl);
+                Finish();
             }
         }
 
@@ -148,14 +149,11 @@ namespace Everwealth.OidcClient
         {
             base.OnResume();
             _isInBackground = false;
-
             if (_isSuccessful)
             {
                 ActivityMediator.Instance.Send(_callbackUrl);
                 Finish();
             }
-
-
         }
 
         protected override void OnPause()
@@ -217,7 +215,6 @@ namespace Everwealth.OidcClient
                 if (request?.Url != null && request.Url.Scheme != "http" && request.Url.Scheme != "https")
                 {
                     if (Context is WebViewActivity)
-                    //ActivityMediator.Instance.Send(request.Url.ToString());
                     _onSuccess?.Invoke(request.Url.ToString());
                     return true;
                 }
@@ -227,7 +224,6 @@ namespace Everwealth.OidcClient
                     if (url.Scheme != "http" && url.Scheme != "https")
                     {
                         Console.WriteLine("URL loading overriden: Hit url {0}", url);
-                        //ActivityMediator.Instance.Send(request.Url.ToString());
                         _onSuccess?.Invoke(request.Url.ToString());
                         return true;
                     }
@@ -257,55 +253,53 @@ namespace Everwealth.OidcClient
                 return true;
             }
 
-        //    public override bool ShouldOverrideUrlLoading(WebView view, string url)
-        //    {
-        //        var uri = Android.Net.Uri.Parse(url);
+            public override bool ShouldOverrideUrlLoading(WebView view, string url)
+            {
+                var uri = Android.Net.Uri.Parse(url);
 
-        //        if (uri != null && uri.Scheme != "http" && uri.Scheme != "https")
-        //        {
-        //            ActivityMediator.Instance.Send(uri.ToString());
-        //            _onSuccess?.Invoke(uri.ToString());
-        //            return true;
-        //        }
+                if (uri != null && uri.Scheme != "http" && uri.Scheme != "https")
+                {
+                    _onSuccess?.Invoke(uri.ToString());
+                    return true;
+                }
 
-        //        if (uri.Scheme != "http" && uri.Scheme != "https")
-        //        {
-        //            Console.WriteLine("URL loading overriden: Hit url {0}", url);
-        //            ActivityMediator.Instance.Send(url);
-        //            _onSuccess?.Invoke();
-        //            return true;
-        //        }
-        //        else if (_restartPaths is string[] restartPaths
-        //            && uri.Host == _startUrl.Host
-        //            && string.IsNullOrEmpty(uri.Query)
-        //            && restartPaths.Contains(uri.Path, StringComparer.OrdinalIgnoreCase))
-        //        {
-        //            Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
-        //            _webView.LoadUrl(_startUrl.ToString(), _headers ?? new Dictionary<string, string>());
-        //            return true;
-        //        }
-        //        else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == uri.Host))
-        //        {
-        //            Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
+                if (uri.Scheme != "http" && uri.Scheme != "https")
+                {
+                    Console.WriteLine("URL loading overriden: Hit url {0}", url);
+                    _onSuccess?.Invoke(url);
+                    return true;
+                }
+                else if (_restartPaths is string[] restartPaths
+                    && uri.Host == _startUrl.Host
+                    && string.IsNullOrEmpty(uri.Query)
+                    && restartPaths.Contains(uri.Path, StringComparer.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Policy Decision: We hit a redirect route, starting a new session {0}", url);
+                    _webView.LoadUrl(_startUrl.ToString(), _headers ?? new Dictionary<string, string>());
+                    return true;
+                }
+                else if (_viewableUrls != null && _viewableUrls.Any(x => Android.Net.Uri.Parse(x).Host == uri.Host))
+                {
+                    Console.WriteLine("Policy Decision: Other Url {0} Opening in external browser", url);
 
-        //            var i = new Intent(Intent.ActionView);
-        //            i.SetData(uri);
-        //            i.AddFlags(ActivityFlags.NoHistory);
-        //            Context.StartActivity(i);
-        //            return true;
+                    var i = new Intent(Intent.ActionView);
+                    i.SetData(uri);
+                    i.AddFlags(ActivityFlags.NoHistory);
+                    Context.StartActivity(i);
+                    return true;
 
-        //        }
-        //        _progressDialog.Visibility = ViewStates.Visible;
-        //        view.LoadUrl(url, _headers ?? new Dictionary<string, string>());
+                }
+                _progressDialog.Visibility = ViewStates.Visible;
+                view.LoadUrl(url, _headers ?? new Dictionary<string, string>());
 
-        //        return true;
-        //    }
+                return true;
+            }
 
-        //    public override void OnPageFinished(WebView view, string url)
-        //    {
-        //        base.OnPageFinished(view, url);
-        //        _progressDialog.Visibility = ViewStates.Invisible;
-        //    }
-        //}
+            public override void OnPageFinished(WebView view, string url)
+            {
+                base.OnPageFinished(view, url);
+                _progressDialog.Visibility = ViewStates.Invisible;
+            }
+        }
     }
 }
