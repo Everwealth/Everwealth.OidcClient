@@ -90,6 +90,10 @@ namespace Everwealth.OidcClient
         public const string RESTART_PATHS = "restart.paths";
         public const string VIEWABLE_URLS = "extra.viewableurls";
         public const string HEADERS = "extra.headers";
+
+        private bool _isSuccessful, _isInBackground;
+        private string _callbackUrl;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -100,7 +104,6 @@ namespace Everwealth.OidcClient
             WebViewBrowser.CancellationToken.Register(() => Finish());
 
             // Cookie settings
-            CookieSyncManager.CreateInstance(this);
             var cookieManager = CookieManager.Instance;
             cookieManager.RemoveAllCookie();
             //cookieManager.SetAcceptCookie(false);
@@ -131,9 +134,32 @@ namespace Everwealth.OidcClient
             webView.LoadUrl(string.IsNullOrEmpty(detourUrl) ? url : detourUrl, headers ?? null);
         }
 
-        private void OnSuccessLogin()
+        private void OnSuccessLogin(string callbackUrl)
         {
-            Finish();
+            _callbackUrl = callbackUrl;
+            _isSuccessful = true;
+            if (!_isInBackground)
+            {
+                ActivityMediator.Instance.Send(_callbackUrl);
+                Finish();
+            }
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            _isInBackground = false;
+            if (_isSuccessful)
+            {
+                ActivityMediator.Instance.Send(_callbackUrl);
+                Finish();
+            }
+        }
+
+        protected override void OnPause()
+        {
+            base.OnPause();
+            _isInBackground = true;
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -154,18 +180,18 @@ namespace Everwealth.OidcClient
             private readonly ProgressBar _progressDialog;
             private readonly Uri _startUrl;
             private readonly string[] _restartPaths;
-            private readonly Action _onSuccess;
+            private readonly Action<string> _onSuccess;
             private readonly string[] _viewableUrls;
             private readonly Dictionary<string, string> _headers;
             private readonly Uri _detourUrl;
 
             public Context Context { get; }
-
+            
             public CustomSchemeWebViewClient(WebView webView,
                                              ProgressBar progressDialog,
                                              string startUrl,
                                              string[] restartPaths,
-                                             Action onSuccess,
+                                             Action<string> onSuccess,
                                              string detourUrl,
                                              string[] viewableUrls,
                                              Dictionary<string, string> headers,
@@ -188,8 +214,8 @@ namespace Everwealth.OidcClient
                 
                 if (request?.Url != null && request.Url.Scheme != "http" && request.Url.Scheme != "https")
                 {
-                    ActivityMediator.Instance.Send(request.Url.ToString());
-                    _onSuccess?.Invoke();
+                    if (Context is WebViewActivity)
+                    _onSuccess?.Invoke(request.Url.ToString());
                     return true;
                 }
 
@@ -198,8 +224,7 @@ namespace Everwealth.OidcClient
                     if (url.Scheme != "http" && url.Scheme != "https")
                     {
                         Console.WriteLine("URL loading overriden: Hit url {0}", url);
-                        ActivityMediator.Instance.Send(request.Url.ToString());
-                        _onSuccess?.Invoke();
+                        _onSuccess?.Invoke(request.Url.ToString());
                         return true;
                     }
                     else if (_restartPaths is string[] restartPaths
@@ -231,19 +256,17 @@ namespace Everwealth.OidcClient
             public override bool ShouldOverrideUrlLoading(WebView view, string url)
             {
                 var uri = Android.Net.Uri.Parse(url);
-                
+
                 if (uri != null && uri.Scheme != "http" && uri.Scheme != "https")
                 {
-                    ActivityMediator.Instance.Send(uri.ToString());
-                    _onSuccess?.Invoke();
+                    _onSuccess?.Invoke(uri.ToString());
                     return true;
                 }
 
                 if (uri.Scheme != "http" && uri.Scheme != "https")
                 {
                     Console.WriteLine("URL loading overriden: Hit url {0}", url);
-                    ActivityMediator.Instance.Send(url);
-                    _onSuccess?.Invoke();
+                    _onSuccess?.Invoke(url);
                     return true;
                 }
                 else if (_restartPaths is string[] restartPaths
